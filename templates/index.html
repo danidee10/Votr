@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="http://getbootstrap.com/favicon.ico">
+
+    <title>Votr!</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for("static", filename="css/bootstrap.min.css") }}" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{{ url_for("static", filename="css/ie10-viewport-bug-workaround.css") }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for("static", filename="css/jumbotron-narrow.css") }}" rel="stylesheet">
+
+    <script src="{{ url_for("static", filename="js/ie-emulation-modes-warning.js") }}"></script>
+  </head>
+
+  <body>
+
+    <div class="container">
+      <div class="header clearfix">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            {% if session.get('user') %}
+            <li class="welcome-message">Hey {{ session['user']}}!</li>
+              <li role="presentation"><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% endif %}
+            <li role="presentation"><a href="/polls">Polls</a></li>
+            <li role="presentation"><a href="https://github.com/danidee10/Votr">Github</a></li>
+          </ul>
+        </nav>
+        <a href="/"><img src="{{ url_for("static", filename="images/logo.png") }}" /></a>
+      </div>
+
+      <div class="jumbotron">
+        <h1>It's easier with Votr!</h1>
+        <p class="lead">Create free online polls today with Votr</p>
+
+        {% if not session.get('user') %}
+        <p><a class="btn btn-lg btn-success" href="{{ url_for('signup') }}" role="button">Sign up today</a></p>
+        {% else %}
+        <p><a class="btn btn-lg btn-success" href="/polls" role="button">Create a poll</a></p>
+        {% endif %}
+      </div>
+
+      <div class="row marketing">
+        <div class="col-lg-6">
+          <h3>Popular votes</h3>
+          <p>It's so easy to use Votr, just create an account and you can start
+          creating polls for the world to see!</p>
+        </div>
+
+        <div class="col-lg-6">
+          <h3 class="form-header">Login</h3>
+          <form method="post" action="{{ url_for('login') }}">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                  {% for category, message in messages %}
+                  <p class="{{ category }}">{{ message }}</p>
+                  {% endfor %}
+              {% endif %}
+          {% endwith %}
+            <div class="form-group has-success">
+              <input type="text" class="form-control" name="username" placeholder="Username" />
+            </div>
+
+            <div class="form-group has-success">
+              <input type="password" class="form-control" name="password" placeholder="Password" />
+            </div>
+
+            <button type="submit" name="submit" class="btn btn-success">Submit</button>
+          </form>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <p>&copy; 2016 Votr</p>
+      </footer>
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{{ url_for("static", filename="js/ie10-viewport-bug-workaround.js") }}"></script>
+  </body>
+</html>
