@@ -73,5 +73,10 @@ def logout():
 
     return redirect(url_for('home'))
 
+@votr.route('/polls')
+def polls():
+
+    return render_template('polls.html')
+
 if __name__ == '__main__':
     votr.run()
