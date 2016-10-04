@@ -1,6 +1,7 @@
 // css style to align text to the center of it's container
 var Align = {
-  textAlign: 'center'
+  textAlign: 'center',
+  fontFamily: 'EB Garamond'
 };
 
 var PollForm = React.createClass({
@@ -22,9 +23,9 @@ var PollForm = React.createClass({
   handleOptionAdd: function(e){
     //update poll options and reset options to an empty string
     this.setState({
-    options: this.state.options.concat({name: this.state.option})
+    options: this.state.options.concat({name: this.state.option}),
+    option: ''
     });
-    this.setState({option: ''});
   },
 
   handleSubmit: function(e){
@@ -45,7 +46,8 @@ var PollForm = React.createClass({
 
         <div className="form-group has-success">
           <label htmlFor="option" className="sr-only">Option</label>
-          <input type="text" id="option" name="option" className="form-control" placeholder="Option" onChange={this.handleOptionChange}  required autoFocus />
+          <input type="text" id="option" name="option" className="form-control" placeholder="Option" onChange={this.handleOptionChange}
+          value={this.state.option ? this.state.option: ''} required autoFocus />
         </div>
 
         <div className="row form-group">
