@@ -20,10 +20,11 @@ var PollForm = React.createClass({
   },
 
   handleOptionAdd: function(e){
-    //update poll options
+    //update poll options and reset options to an empty string
     this.setState({
     options: this.state.options.concat({name: this.state.option})
     });
+    this.setState({option: ''});
   },
 
   handleSubmit: function(e){
