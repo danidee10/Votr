@@ -36,7 +36,7 @@ var PollForm = React.createClass({
   render: function(){
     return (
     <div>
-      <form id="poll_form" className="form-signin" method="POST" action="/polls">
+      <form id="poll_form" className="form-signin" onSubmit={this.handleSubmit}>
         <h2 className="form-signin-heading" style={Align}>Create a poll</h2>
 
         <div className="form-group has-success">
