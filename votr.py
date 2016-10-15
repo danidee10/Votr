@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, flash, session, redirect, url_for
+from flask import Flask, render_template, request, flash, session, redirect, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Users
+from flask_migrate import Migrate
+from models import db, Users, Polls, Topics, Options
 
-votr = Flask('__name__')
+votr = Flask(__name__)
 
 # load config from the config file we created earlier
 votr.config.from_object('config')
@@ -11,9 +12,13 @@ votr.config.from_object('config')
 db.init_app(votr)
 db.create_all(app=votr)
 
+migrate = Migrate(votr, db, render_as_batch=True)
+
+
 @votr.route('/')
 def home():
     return render_template('index.html')
+
 
 @votr.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -38,6 +43,7 @@ def signup():
 
     # it's a GET request, just render the template
     return render_template('signup.html')
+
 
 @votr.route('/login', methods=['POST'])
 def login():
@@ -64,6 +70,7 @@ def login():
 
     return redirect(url_for('home'))
 
+
 @votr.route('/logout')
 def logout():
     if 'user' in session:
@@ -73,10 +80,70 @@ def logout():
 
     return redirect(url_for('home'))
 
-@votr.route('/polls')
-def polls():
 
+@votr.route('/polls', methods=['GET'])
+def polls():
     return render_template('polls.html')
 
-if __name__ == '__main__':
-    votr.run()
+
+@votr.route('/api/polls', methods=['GET', 'POST'])
+# retrieves/adds polls from/to the database
+def api_polls():
+    if request.method == 'POST':
+        # get the poll and save it in the database
+        poll = request.get_json()
+
+        # simple validation to check if all values are properly secret
+        for key, value in poll.items():
+            if not value:
+                return jsonify({'error': 'value for {} is empty'.format(key)})
+
+        title = poll['title']
+        options_query = lambda option : Options.query.filter(Options.name.like(option))
+
+        options = [Polls(option=Options(name=option))
+                      if options_query(option).count() == 0
+                      else Polls(option=options_query(option).first()) for option in poll['options']
+                  ]
+
+        new_topic = Topics(title=title, options=options)
+
+        db.session.add(new_topic)
+        db.session.commit()
+
+        return jsonify({'message': 'Poll was created succesfully'})
+
+    else:
+        # it's a GET request, return dict representations of the API
+        polls = Topics.query.join(Polls).all()
+        all_polls = {'Polls':  [poll.to_json() for poll in polls]}
+
+        return jsonify(all_polls)
+
+@votr.route('/api/polls/options')
+def api_polls_options():
+
+    all_options = [option.to_json() for option in Options.query.all()]
+
+    return jsonify(all_options)
+
+
+@votr.route('/api/poll/vote', methods=['PATCH'])
+def api_poll_vote():
+
+    poll = request.get_json()
+
+    poll_title, option = (poll['poll_title'], poll['option'])
+
+    join_tables = Polls.query.join(Topics).join(Options)
+    # filter options
+    option = join_tables.filter(Topics.title.like(poll_title)).filter(Options.name.like(option)).first()
+
+    # increment vote_count by 1 if the option was found
+    if option:
+        option.vote_count += 1
+        db.session.commit()
+
+        return jsonify({'message': 'Thank you for voting'})
+
+    return jsonify({'message': 'option or poll was not found please try again'})
