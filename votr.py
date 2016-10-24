@@ -96,10 +96,10 @@ def api_polls():
         # simple validation to check if all values are properly secret
         for key, value in poll.items():
             if not value:
-                return jsonify({'error': 'value for {} is empty'.format(key)})
+                return jsonify({'message': 'value for {} is empty'.format(key)})
 
         title = poll['title']
-        options_query = lambda option : Options.query.filter(Options.name.like(option))
+        options_query = lambda option: Options.query.filter(Options.name.like(option))
 
         options = [Polls(option=Options(name=option))
                       if options_query(option).count() == 0
@@ -115,10 +115,11 @@ def api_polls():
 
     else:
         # it's a GET request, return dict representations of the API
-        polls = Topics.query.join(Polls).all()
+        polls = Topics.query.join(Polls).order_by(Topics.id.desc()).all()
         all_polls = {'Polls':  [poll.to_json() for poll in polls]}
 
         return jsonify(all_polls)
+
 
 @votr.route('/api/polls/options')
 def api_polls_options():
@@ -130,7 +131,6 @@ def api_polls_options():
 
 @votr.route('/api/poll/vote', methods=['PATCH'])
 def api_poll_vote():
-
     poll = request.get_json()
 
     poll_title, option = (poll['poll_title'], poll['option'])
@@ -147,3 +147,10 @@ def api_poll_vote():
         return jsonify({'message': 'Thank you for voting'})
 
     return jsonify({'message': 'option or poll was not found please try again'})
+
+
+@votr.route('/api/poll/<poll_name>')
+def api_poll(poll_name):
+    poll = Topics.query.filter(Topics.title.like(poll_name)).filter_by(status=1).first()
+
+    return jsonify(poll.to_json()) or 'Not found'

@@ -14,8 +14,18 @@
     <!-- Bootstrap core CSS -->
     <link href="{{ url_for("static", filename="css/bootstrap.min.css") }}" rel="stylesheet">
 
+    <link href="https://fonts.googleapis.com/css?family=Cabin" rel="stylesheet">
+
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{{ url_for("static", filename="css/ie10-viewport-bug-workaround.css") }}" rel="stylesheet">
+
+    <!-- React JS -->
+    <script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
+    <script src="https://npmcdn.com/react-router@2.8.1/umd/ReactRouter.min.js"></script>
+    <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script type="text/babel" src="{{ url_for('static', filename='js/polls.js') }}"></script>
 
     <!-- Custom styles for this template -->
     <link href="{{ url_for("static", filename="css/jumbotron-narrow.css") }}" rel="stylesheet">
@@ -24,10 +34,7 @@
   </head>
 
   <body>
-
-    <div class="container">
-      <div class="header clearfix">
-        <nav>
+        <nav class="navbar navbar-default navbar-fixed-top">
           <ul class="nav nav-pills pull-right">
             {% if session.get('user') %}
             <li class="welcome-message">Hey {{ session['user']}}!</li>
@@ -36,9 +43,8 @@
             <li role="presentation"><a href="/polls">Polls</a></li>
             <li role="presentation"><a href="https://github.com/danidee10/Votr">Github</a></li>
           </ul>
+          <a style="padding-left: 30px;" href="/"><img src="{{ url_for("static", filename="images/logo.png") }}" /></a>
         </nav>
-        <a href="/"><img src="{{ url_for("static", filename="images/logo.png") }}" /></a>
-      </div>
 
       <div class="jumbotron">
         <h1>It's easier with Votr!</h1>
@@ -51,34 +57,46 @@
         {% endif %}
       </div>
 
-      <div class="row marketing">
-        <div class="col-lg-6">
-          <h3>Popular votes</h3>
-          <p>It's so easy to use Votr, just create an account and you can start
-          creating polls for the world to see!</p>
+      <div class="container" id="container">
+
+        <div class="row marketing">
+
+          {% if not session.get('user') %}
+          <div class="col-lg-6">
+            <h3>Popular votes</h3>
+            <p>It's so easy to use Votr, just create an account and you can start
+            creating polls for the world to see!</p>
+          </div>
+
+          <div class="col-lg-6">
+            <h3 class="form-header">Login</h3>
+            <form method="post" action="{{ url_for('login') }}">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+              <div class="form-group has-success">
+                <input type="text" class="form-control" name="username" placeholder="Username" />
+              </div>
+
+              <div class="form-group has-success">
+                <input type="password" class="form-control" name="password" placeholder="Password" />
+              </div>
+
+              <button type="submit" name="submit" class="btn btn-success">Submit</button>
+            </form>
+          </div>
+
+          {% else %}
+            <div id="latest_polls" class="row marketing">
+
+            </div>
+          {% endif %}
         </div>
 
-        <div class="col-lg-6">
-          <h3 class="form-header">Login</h3>
-          <form method="post" action="{{ url_for('login') }}">
-          {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                  {% for category, message in messages %}
-                  <p class="{{ category }}">{{ message }}</p>
-                  {% endfor %}
-              {% endif %}
-          {% endwith %}
-            <div class="form-group has-success">
-              <input type="text" class="form-control" name="username" placeholder="Username" />
-            </div>
-
-            <div class="form-group has-success">
-              <input type="password" class="form-control" name="password" placeholder="Password" />
-            </div>
-
-            <button type="submit" name="submit" class="btn btn-success">Submit</button>
-          </form>
-        </div>
       </div>
 
       <footer class="footer">

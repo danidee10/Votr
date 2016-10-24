@@ -4,6 +4,7 @@ import uuid
 # create a new SQLAlchemy object
 db = SQLAlchemy()
 
+
 # Base model that for other models to inherit from
 class Base(db.Model):
     __abstract__ = True
@@ -13,17 +14,18 @@ class Base(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
             onupdate=db.func.current_timestamp())
 
+
 # Model to store user details
 class Users(Base):
     email = db.Column(db.String(100), unique=True)
     username = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(300)) # incase password hash becomes too long
+    password = db.Column(db.String(300))  # incase password hash becomes too long
 
 
 # Model for poll topics
 class Topics(Base):
     title = db.Column(db.String(500))
-    status = db.Column(db.Boolean, default=1) # to mark poll as open or closed should be under title not polls
+    status = db.Column(db.Boolean, default=1)  # to mark poll as open or closed should be under title not polls
     create_uid = db.Column(db.ForeignKey('users.id'))
 
     created_by = db.relationship('Users', foreign_keys=[create_uid],
@@ -35,13 +37,20 @@ class Topics(Base):
 
     # returns dictionary that can easily be jsonified
     def to_json(self):
+        # get total vote counter
+        total_vote_count = 0
+        for option in self.options.all():
+            total_vote_count += option.vote_count
+
         return {
                 'title': self.title,
                 'options':
                     [{'name': option.option.name, 'vote_count': option.vote_count}
                         for option in self.options.all()],
-                'status': self.status
+                'status': self.status,
+                'total_vote_count': total_vote_count
             }
+
 
 # Model for poll options
 class Options(Base):
@@ -55,6 +64,7 @@ class Options(Base):
                 'id': uuid.uuid4(), # Generates a random uuid
                 'name': self.name
         }
+
 
 # Polls model to connect topics and options together
 class Polls(Base):

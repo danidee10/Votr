@@ -1,12 +1,26 @@
+var Router = ReactRouter.Router;
+var Route = ReactRouter.Route;
+var browserHistory = ReactRouter.browserHistory;
+
+
 // css style to align text to the center of it's container
 var Align = {
   textAlign: 'center',
   fontFamily: 'EB Garamond'
 };
 
+var progressText = {
+  position: 'relative',
+  left: '-130px',
+  bottom: '5px',
+  color: '#3c763d'
+};
+
+var origin = window.location.origin;
+
 var PollForm = React.createClass({
 
-  getInitialState: function(e){
+  getInitialState: function(){
     // set initial state of form inputs
     return {title: '', option: '', options: []}
   },
@@ -31,6 +45,26 @@ var PollForm = React.createClass({
   handleSubmit: function(e){
     //TODO handle form submit
     e.preventDefault();
+    var title = this.state.title;
+    var options = this.state.options;
+
+    var data = {'title': title, options: options.map(function(x){return x.name})};
+    var url =  origin + '/api/polls'
+
+    // make post request
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      type: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'application/json; charset=utf-8',
+      success: function(data){
+        alert(data.message);
+      }.bind(this),
+      error: function(xhr, status, err){
+        alert('Poll creation failed: ' + err.toString());
+      }.bind(this)
+    });
   },
 
   render: function(){
@@ -46,12 +80,19 @@ var PollForm = React.createClass({
 
         <div className="form-group has-success">
           <label htmlFor="option" className="sr-only">Option</label>
-          <input type="text" id="option" name="option" className="form-control" placeholder="Option" onChange={this.handleOptionChange}
-          value={this.state.option ? this.state.option: ''} required autoFocus />
+          <input list="option" className="form-control" placeholder="Option" onChange={this.handleOptionChange}
+          value={this.state.option ? this.state.option: ''} autoFocus />
+
+          <datalist id="option">
+            <option value="Django" />
+            <option value="Flask" />
+            <option value="Pyramid" />
+            <option value="Ruby" />
+          </datalist>
         </div>
 
         <div className="row form-group">
-          <button className="btn btn-lg btn-success btn-block" onClick={this.handleOptionAdd}>Add option</button>
+          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.handleOptionAdd}>Add option</button>
           <button className="btn btn-lg btn-success btn-block" type="submit">Save poll</button>
         </div>
         <br />
@@ -65,40 +106,145 @@ var PollForm = React.createClass({
 });
 
 var LivePreview = React.createClass({
-  render: function(){
 
+  getInitialState: function(){
+    return {selected_option: '', total_vote_count: 0, disabled: 0};
+  },
+
+  handleOptionChange: function(e){
+    this.setState({selected_option: e.target.value });
+  },
+
+  voteHandler: function(e){
+    e.preventDefault();
+
+    var data = {"poll_title": this.props.title, "option": this.state.selected_option};
+
+    //calls props handler
+    this.props.voteHandler(data);
+
+    //disable the button
+    this.setState({disabled: 1});
+
+  },
+
+
+  render: function(){
     var options = this.props.options.map(function(option){
 
       if(option.name) {
+
+        // calculate progress bar percentage
+        var progress = Math.round((option.vote_count / this.props.total_vote_count) * 100) || 0
+
         return (
           <div key={option.name}>
-            <input name="options" type="radio" value={option.name} /> {option.name}
+            <input name="options" type="radio" value={option.name} onChange={this.handleOptionChange} /> {option.name}
+            <br />
+            <progress value={progress} max="100"></progress><small style={progressText}>{progress}%</small>
             <br />
           </div>
         );
       }
-    });
+    }.bind(this));
 
     return(
-      <div className="panel panel-success">
-        <div className="panel-heading">
-          <h4>{this.props.title}</h4>
-        </div>
-        <div className="panel-body">
-          <form>
-            {options}
-            <br />
-            <button type="submit" className="btn btn-success btn-outline hvr-grow">Vote!</button>
-          </form>
+      <div className="col-sm-6">
+        <div className="panel panel-success">
+          <div className="panel-heading">
+            <h4>{this.props.title}</h4>
+          </div>
+          <div className="panel-body">
+            <form onSubmit={this.voteHandler}>
+              {options}
+              <br />
+              <button type="submit" disabled={this.state.disabled} className="btn btn-success btn-outline hvr-grow">Vote!</button> <small>{this.props.total_vote_count} votes so far</small>
+            </form>
+          </div>
         </div>
       </div>
     )
   }
 });
 
-ReactDOM.render(
-  <div>
-    <PollForm />
-  </div>,
-  document.getElementById('form_container')
+var LivePreviewProps = React.createClass({
+
+  voteHandler: function(data){
+
+    var url =  origin + '/api/poll/vote'
+
+    // make patch request
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      type: 'PATCH',
+      data: JSON.stringify(data),
+      contentType: 'application/json; charset=utf-8',
+      success: function(data){
+        alert(data.message);
+        this.setState({selected_option: ''});
+        this.props.loadPollsFromServer();
+      }.bind(this),
+      error: function(xhr, status, err){
+        alert('Poll creation failed: ' + err.toString());
+      }.bind(this)
+    });
+
+  },
+
+
+  render: function(){
+    var polls = this.props.polls.Polls.map(function(poll){
+      return (
+        <LivePreview key={poll.title} title={poll.title} options={poll.options} total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler} />
+    );
+  }.bind(this));
+
+    return (
+      <div className="row marketing">{polls}</div>
+    );
+  }
+});
+
+var AllPolls = React.createClass({
+
+  getInitialState: function(){
+    return {polls: {'Polls': []}};
+  },
+
+  loadPollsFromServer: function(){
+    var url =  origin + '/api/polls'
+    //make get request
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        this.setState({polls: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(url, status, err.toString());
+      }.bind(this)
+    });
+  },
+
+  componentDidMount: function(){
+    this.loadPollsFromServer()
+  },
+
+  render: function(){
+    return (
+      <LivePreviewProps polls={this.state.polls} loadPollsFromServer={this.loadPollsFromServer} />
+    );
+  }
+
+});
+
+ReactDOM.render((
+  <Router history={browserHistory}>
+    <Route path="/" component={AllPolls} />
+    <Route path="/polls" component={PollForm} />
+  </Router>
+  ),
+  document.getElementById('container')
 );
