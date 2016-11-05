@@ -12,7 +12,7 @@ class Base(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
-            onupdate=db.func.current_timestamp())
+                              onupdate=db.func.current_timestamp())
 
 
 # Model to store user details
@@ -25,11 +25,11 @@ class Users(Base):
 # Model for poll topics
 class Topics(Base):
     title = db.Column(db.String(500))
-    status = db.Column(db.Boolean, default=1)  # to mark poll as open or closed should be under title not polls
+    status = db.Column(db.Boolean, default=1)  # to mark poll as open or closed
     create_uid = db.Column(db.ForeignKey('users.id'))
 
     created_by = db.relationship('Users', foreign_keys=[create_uid],
-                    backref=db.backref('user_polls', lazy='dynamic'))
+                                 backref=db.backref('user_polls', lazy='dynamic'))
 
     # user friendly way to display the object
     def __repr__(self):
@@ -44,9 +44,8 @@ class Topics(Base):
 
         return {
                 'title': self.title,
-                'options':
-                    [{'name': option.option.name, 'vote_count': option.vote_count}
-                        for option in self.options.all()],
+                'options': [{'name': option.option.name, 'vote_count': option.vote_count}
+                            for option in self.options.all()],
                 'status': self.status,
                 'total_vote_count': total_vote_count
             }
@@ -61,7 +60,7 @@ class Options(Base):
 
     def to_json(self):
         return {
-                'id': uuid.uuid4(), # Generates a random uuid
+                'id': uuid.uuid4(),  # Generates a random uuid
                 'name': self.name
         }
 
@@ -77,8 +76,8 @@ class Polls(Base):
     # Relationship declaration (makes it easier for us to access the polls model
     # from the other models it's related to)
     topic = db.relationship('Topics', foreign_keys=[topic_id],
-            backref=db.backref('options', lazy='dynamic'))
-    option = db.relationship('Options',foreign_keys=[option_id])
+                            backref=db.backref('options', lazy='dynamic'))
+    option = db.relationship('Options', foreign_keys=[option_id])
 
     def __repr__(self):
         # a user friendly way to view our objects in the terminal

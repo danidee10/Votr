@@ -57,13 +57,13 @@
         {% endif %}
       </div>
 
-      <div class="container" id="container">
+      <div class="container">
 
         <div class="row marketing">
 
           {% if not session.get('user') %}
           <div class="col-lg-6">
-            <h3>Popular votes</h3>
+            <h3>It's so easy</h3>
             <p>It's so easy to use Votr, just create an account and you can start
             creating polls for the world to see!</p>
           </div>
@@ -91,7 +91,8 @@
           </div>
 
           {% else %}
-            <div id="latest_polls" class="row marketing">
+            <h2 style="text-align: center;">Latest polls</h2>
+            <div id="container" class="row marketing">
 
             </div>
           {% endif %}

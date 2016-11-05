@@ -102,9 +102,9 @@ def api_polls():
         options_query = lambda option: Options.query.filter(Options.name.like(option))
 
         options = [Polls(option=Options(name=option))
-                      if options_query(option).count() == 0
-                      else Polls(option=options_query(option).first()) for option in poll['options']
-                  ]
+                   if options_query(option).count() == 0
+                   else Polls(option=options_query(option).first()) for option in poll['options']
+                   ]
 
         new_topic = Topics(title=title, options=options)
 
@@ -115,7 +115,7 @@ def api_polls():
 
     else:
         # it's a GET request, return dict representations of the API
-        polls = Topics.query.join(Polls).order_by(Topics.id.desc()).all()
+        polls = Topics.query.filter_by(status=1).join(Polls).order_by(Topics.id.desc()).all()
         all_polls = {'Polls':  [poll.to_json() for poll in polls]}
 
         return jsonify(all_polls)
@@ -149,8 +149,10 @@ def api_poll_vote():
     return jsonify({'message': 'option or poll was not found please try again'})
 
 
-@votr.route('/api/poll/<poll_name>')
+@votr.route('/poll/<poll_name>')
 def api_poll(poll_name):
     poll = Topics.query.filter(Topics.title.like(poll_name)).filter_by(status=1).first()
 
-    return jsonify(poll.to_json()) or 'Not found'
+    poll_json = poll.to_json()
+
+    return jsonify(poll_json)

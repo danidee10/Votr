@@ -2,13 +2,13 @@ var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
 var browserHistory = ReactRouter.browserHistory;
 
-
 // css style to align text to the center of it's container
 var Align = {
   textAlign: 'center',
   fontFamily: 'EB Garamond'
 };
 
+// css to position progress text inside the progress bar
 var progressText = {
   position: 'relative',
   left: '-130px',
@@ -20,9 +20,9 @@ var origin = window.location.origin;
 
 var PollForm = React.createClass({
 
-  getInitialState: function(){
+  getInitialState: function(e){
     // set initial state of form inputs
-    return {title: '', option: '', options: []}
+    return {title: '', option: '', options: [], all_options: []}
   },
 
   handleTitleChange: function(e){
@@ -42,8 +42,27 @@ var PollForm = React.createClass({
     });
   },
 
+  componentDidMount: function(){
+
+    var url =  origin + '/api/polls/options'
+
+    //get all options
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        console.log(data);
+        this.setState({all_options: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(url, status, err.toString());
+      }.bind(this)
+    });
+
+  },
+
   handleSubmit: function(e){
-    //TODO handle form submit
     e.preventDefault();
     var title = this.state.title;
     var options = this.state.options;
@@ -68,6 +87,11 @@ var PollForm = React.createClass({
   },
 
   render: function(){
+
+    var all_options = this.state.all_options.map(function(option){
+                        return(<option key={option.id} value={option.name} />)
+                      });
+
     return (
     <div>
       <form id="poll_form" className="form-signin" onSubmit={this.handleSubmit}>
@@ -82,14 +106,11 @@ var PollForm = React.createClass({
           <label htmlFor="option" className="sr-only">Option</label>
           <input list="option" className="form-control" placeholder="Option" onChange={this.handleOptionChange}
           value={this.state.option ? this.state.option: ''} autoFocus />
-
-          <datalist id="option">
-            <option value="Django" />
-            <option value="Flask" />
-            <option value="Pyramid" />
-            <option value="Ruby" />
-          </datalist>
         </div>
+
+        <datalist id="option">
+          {all_options}
+        </datalist>
 
         <div className="row form-group">
           <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.handleOptionAdd}>Add option</button>
@@ -98,8 +119,17 @@ var PollForm = React.createClass({
         <br />
       </form>
 
+      <div className="row">
       <h3 style={Align}>Live Preview</h3>
-      <LivePreview title={this.state.title} options={this.state.options} />
+
+        {/* Blank column to position LivePreview properly */}
+        <div className="col-sm-4">
+        </div>
+
+        <div className="col-sm-8">
+          <LivePreview title={this.state.title} options={this.state.options} />
+        </div>
+      </div>
     </div>
     );
   }
@@ -108,12 +138,13 @@ var PollForm = React.createClass({
 var LivePreview = React.createClass({
 
   getInitialState: function(){
-    return {selected_option: '', total_vote_count: 0, disabled: 0};
+    return {selected_option: '', disabled: 0};
   },
 
   handleOptionChange: function(e){
     this.setState({selected_option: e.target.value });
   },
+
 
   voteHandler: function(e){
     e.preventDefault();
@@ -127,7 +158,6 @@ var LivePreview = React.createClass({
     this.setState({disabled: 1});
 
   },
-
 
   render: function(){
     var options = this.props.options.map(function(option){
@@ -166,6 +196,7 @@ var LivePreview = React.createClass({
     )
   }
 });
+
 
 var LivePreviewProps = React.createClass({
 
@@ -237,6 +268,61 @@ var AllPolls = React.createClass({
       <LivePreviewProps polls={this.state.polls} loadPollsFromServer={this.loadPollsFromServer} />
     );
   }
+
+});
+
+
+var Poll = React.createClass({
+
+  getInitialState: function(){
+    return {poll: {}}
+  },
+
+  voteHandler: function(data){
+
+    var url =  origin + '/api/poll/vote'
+
+    // make patch request
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      type: 'PATCH',
+      data: JSON.stringify(data),
+      contentType: 'application/json; charset=utf-8',
+      success: function(data){
+        alert(data.message);
+        this.setState({selected_option: ''});
+        this.props.loadPollsFromServer();
+      }.bind(this),
+      error: function(xhr, status, err){
+        alert('Poll creation failed: ' + err.toString());
+      }.bind(this)
+    });
+
+  },
+
+
+  componentDidMount: function(){
+    var location = window.location.pathname
+    var url =  origin + '/api/poll' + location
+    //make get request
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        this.setState({poll: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(url, status, err.toString());
+      }.bind(this)
+    });
+  },
+
+  render: function(){
+    return (
+      <LivePreview key={poll.title} title={this.state.poll.title} options={this.state.poll.options} total_vote_count={this.state.poll.total_vote_count} voteHandler={this.voteHandler} />
+    )}
 
 });
 
