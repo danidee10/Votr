@@ -149,10 +149,13 @@ def api_poll_vote():
     return jsonify({'message': 'option or poll was not found please try again'})
 
 
-@votr.route('/poll/<poll_name>')
+@votr.route('/polls/<poll_name>')
+def poll(poll_name):
+
+    return render_template('index.html')
+
+@votr.route('/api/poll/<poll_name>')
 def api_poll(poll_name):
-    poll = Topics.query.filter(Topics.title.like(poll_name)).filter_by(status=1).first()
+    poll = Topics.query.filter(Topics.title.like(poll_name)).first()
 
-    poll_json = poll.to_json()
-
-    return jsonify(poll_json)
+    return jsonify({'Polls': [poll.to_json()]}) if poll else jsonify({'message': 'poll not found'})

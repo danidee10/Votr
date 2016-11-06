@@ -6,25 +6,6 @@ body {
   font-size: 19px;
 }
 
-progress[value] {
-  /* Reset the default appearance */
-  -webkit-appearance: none;
-   appearance: none;
-
-  width: 250px;
-  height: 20px;
-}
-
-progress[value]::-webkit-progress-bar {
-  background-color: #fff;
-  border-radius: 2px;
-  border: 1px solid #d6e9c6;
-}
-
-progress[value]::-webkit-progress-value {
-  background-color: #dff0d8;
-}
-
 .form-signin {
   max-width: 330px;
   padding: 15px;

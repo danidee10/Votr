@@ -8,14 +8,7 @@ var Align = {
   fontFamily: 'EB Garamond'
 };
 
-// css to position progress text inside the progress bar
-var progressText = {
-  position: 'relative',
-  left: '-130px',
-  bottom: '5px',
-  color: '#3c763d'
-};
-
+//global variable to store origin url (e.g http://localhost:5000)
 var origin = window.location.origin;
 
 var PollForm = React.createClass({
@@ -88,6 +81,8 @@ var PollForm = React.createClass({
 
   render: function(){
 
+    var classContext = "col-sm-6 col-sm-offset-3"
+
     var all_options = this.state.all_options.map(function(option){
                         return(<option key={option.id} value={option.name} />)
                       });
@@ -121,14 +116,7 @@ var PollForm = React.createClass({
 
       <div className="row">
       <h3 style={Align}>Live Preview</h3>
-
-        {/* Blank column to position LivePreview properly */}
-        <div className="col-sm-4">
-        </div>
-
-        <div className="col-sm-8">
-          <LivePreview title={this.state.title} options={this.state.options} />
-        </div>
+        <LivePreview title={this.state.title} options={this.state.options} classContext={classContext} />
       </div>
     </div>
     );
@@ -166,20 +154,25 @@ var LivePreview = React.createClass({
 
         // calculate progress bar percentage
         var progress = Math.round((option.vote_count / this.props.total_vote_count) * 100) || 0
+        var current = {width: progress+"%"}
 
         return (
           <div key={option.name}>
             <input name="options" type="radio" value={option.name} onChange={this.handleOptionChange} /> {option.name}
-            <br />
-            <progress value={progress} max="100"></progress><small style={progressText}>{progress}%</small>
-            <br />
+            <div className="progress">
+              <div className="progress-bar progress-bar-success" role="progressbar" aria-valuenow={progress}
+              aria-valuemin="0" aria-valuemax="100" style={current}>
+                {progress}%
+              </div>
+            </div>
           </div>
         );
       }
     }.bind(this));
 
     return(
-      <div className="col-sm-6">
+
+      <div className={this.props.classContext}>
         <div className="panel panel-success">
           <div className="panel-heading">
             <h4>{this.props.title}</h4>
@@ -227,12 +220,18 @@ var LivePreviewProps = React.createClass({
   render: function(){
     var polls = this.props.polls.Polls.map(function(poll){
       return (
-        <LivePreview key={poll.title} title={poll.title} options={poll.options} total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler} />
+        <LivePreview key={poll.title} title={poll.title} options={poll.options}
+        total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler}
+        classContext={this.props.classContext} />
     );
   }.bind(this));
 
     return (
-      <div className="row marketing">{polls}</div>
+      <div>
+        <h1 style={Align}>{this.props.header}</h1>
+        <br />
+        <div className="row">{polls}</div>
+      </div>
     );
   }
 });
@@ -240,11 +239,23 @@ var LivePreviewProps = React.createClass({
 var AllPolls = React.createClass({
 
   getInitialState: function(){
-    return {polls: {'Polls': []}};
+    return {polls: {'Polls': []}, header: '', classContext: ''};
   },
 
   loadPollsFromServer: function(){
-    var url =  origin + '/api/polls'
+
+    // pollName is available as a prop
+    var pollName = this.props.routeParams.pollName
+
+    if(pollName){
+        var url = origin + '/api/poll/' + pollName
+        this.setState({classContext: 'col-sm-6 col-sm-offset-3'})
+
+    } else {
+        var url = origin + '/api/polls'
+        this.setState({header: 'Latest polls', classContext: 'col-sm-6'})
+    }
+
     //make get request
     $.ajax({
       url: url,
@@ -264,72 +275,30 @@ var AllPolls = React.createClass({
   },
 
   render: function(){
+
+    // if a message was returned in the json result (the poll wasn't found)
+    if(!this.state.polls.message){
+
     return (
-      <LivePreviewProps polls={this.state.polls} loadPollsFromServer={this.loadPollsFromServer} />
-    );
-  }
-
-});
-
-
-var Poll = React.createClass({
-
-  getInitialState: function(){
-    return {poll: {}}
-  },
-
-  voteHandler: function(data){
-
-    var url =  origin + '/api/poll/vote'
-
-    // make patch request
-    $.ajax({
-      url: url,
-      dataType: 'json',
-      type: 'PATCH',
-      data: JSON.stringify(data),
-      contentType: 'application/json; charset=utf-8',
-      success: function(data){
-        alert(data.message);
-        this.setState({selected_option: ''});
-        this.props.loadPollsFromServer();
-      }.bind(this),
-      error: function(xhr, status, err){
-        alert('Poll creation failed: ' + err.toString());
-      }.bind(this)
-    });
-
-  },
-
-
-  componentDidMount: function(){
-    var location = window.location.pathname
-    var url =  origin + '/api/poll' + location
-    //make get request
-    $.ajax({
-      url: url,
-      dataType: 'json',
-      cache: false,
-      success: function(data) {
-        this.setState({poll: data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(url, status, err.toString());
-      }.bind(this)
-    });
-  },
-
-  render: function(){
-    return (
-      <LivePreview key={poll.title} title={this.state.poll.title} options={this.state.poll.options} total_vote_count={this.state.poll.total_vote_count} voteHandler={this.voteHandler} />
-    )}
-
-});
+      <LivePreviewProps polls={this.state.polls} loadPollsFromServer={this.loadPollsFromServer}
+      header={this.state.header} classContext={this.state.classContext} />
+      );
+    } else {
+      return (
+          <div style={Align}>
+            <h1>Poll not found</h1>
+            <p>You might be interested in these <a href="/">polls</a></p>
+          </div>
+        )
+      }
+    }
+  });
 
 ReactDOM.render((
   <Router history={browserHistory}>
     <Route path="/" component={AllPolls} />
     <Route path="/polls" component={PollForm} />
+    <Route path="/polls/:pollName" component={AllPolls} />
   </Router>
   ),
   document.getElementById('container')
