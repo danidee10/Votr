@@ -1,11 +1,24 @@
 # Votr
-Repo for How to build an online voting application with Flask and React
+Repository for my tutorial on [How to build an online voting application with Flask and React](https://danidee10.github.io/2016/09/18/flask-by-example-1.html)
 
-This is still a work in progress, the full steps and guide on how i built this application is available on my [blog](https://danidee10.github.io/2016/09/18/flask-by-example-1.html)
 
-Don't forget to leave a comment (>‿◠)✌
+Don't forget to leave a comment when you visit (>‿◠)✌
 
-# Votr in action
+**NOTE: This is still a WIP**
+
+## Table of content
+_________________________________________________________________________________________
+  - Introduction and installation
+  - Design and manipulate the database with SQLAlchemy
+  - Templating, authentication and static assets
+  - Building an interactive UI with ReactJS
+  - How to build a simple REST API with Flask
+  - Connecting React to a REST API
+  - Spin up an Admin dashboard quickly and easily with Flask-Admin
+
+ The table of contents lists the main topic of focus in each part, but each article also covers other topics
+
+## Votr in action
 
 ![create a poll](/static/images/screenshot.png)
 
