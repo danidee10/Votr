@@ -7,16 +7,19 @@ Don't forget to leave a comment when you visit (>‿◠)✌
 **NOTE: This is still a WIP**
 
 ## Table of content
-_________________________________________________________________________________________
-  - Introduction and installation
-  - Design and manipulate the database with SQLAlchemy
-  - Templating, authentication and static assets
-  - Building an interactive UI with ReactJS
-  - How to build a simple REST API with Flask
-  - Connecting React to a REST API
-  - Spin up an Admin dashboard quickly and easily with Flask-Admin
+  - Part 1 - **Introduction and installation**
+  - Part 2 - **Design and manipulate the database with SQLAlchemy**
+  - Part 3 - **Templating, authentication and static assets**
+  - Part 4 - **Building an interactive UI with ReactJS**
+  - Part 5 - **How to build a simple REST API with Flask**
+  - Part 6 - **Connecting React to a REST API**
+  - Part 7 - **Spin up an Admin dashboard quickly and easily with Flask-Admin**
+
+<br />
 
  The table of contents lists the main topic of focus in each part, but each article also covers other topics
+
+
 
 ## Votr in action
 
@@ -30,7 +33,7 @@ ________________________________________________________________________________
 https://github.com/danidee10/Votr.git
 ```
 
-install requirements
+Install requirements
 
 ```bash
 pip install -r requirements.txt

@@ -1,4 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import select, func
 import uuid
 
 # create a new SQLAlchemy object
@@ -37,18 +39,24 @@ class Topics(Base):
 
     # returns dictionary that can easily be jsonified
     def to_json(self):
-        # get total vote counter
-        total_vote_count = 0
-        for option in self.options.all():
-            total_vote_count += option.vote_count
-
         return {
                 'title': self.title,
                 'options': [{'name': option.option.name, 'vote_count': option.vote_count}
                             for option in self.options.all()],
                 'status': self.status,
-                'total_vote_count': total_vote_count
+                'total_vote_count': self.total_vote_count
             }
+
+    @hybrid_property
+    def total_vote_count(self, total=0):
+        for option in self.options.all():
+            total += option.vote_count
+
+        return total
+
+    @total_vote_count.expression
+    def total_vote_count(cls):
+        return select([func.sum(Polls.vote_count)]).where(Polls.topic_id == cls.id)
 
 
 # Model for poll options
@@ -82,3 +90,15 @@ class Polls(Base):
     def __repr__(self):
         # a user friendly way to view our objects in the terminal
         return self.option.name
+
+
+class UserPolls(Base):
+
+    topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    topics = db.relationship('Topics', foreign_keys=[topic_id],
+                             backref=db.backref('voted_on_by', lazy='dynamic'))
+
+    users = db.relationship('Users', foreign_keys=[user_id],
+                            backref=db.backref('voted_on', lazy='dynamic'))

@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, flash, session, redirect, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
-from models import db, Users, Polls, Topics, Options
+from models import db, Users, Polls, Topics, Options, UserPolls
+from flask_admin import Admin
+from admin import AdminView, TopicView
 
 votr = Flask(__name__)
 
@@ -13,6 +15,12 @@ db.init_app(votr)
 db.create_all(app=votr)
 
 migrate = Migrate(votr, db, render_as_batch=True)
+
+admin = Admin(votr, name='Dashboard', index_view=TopicView(Topics, db.session, url='/admin', endpoint='admin'))
+admin.add_view(AdminView(Users, db.session))
+admin.add_view(AdminView(Polls, db.session))
+admin.add_view(AdminView(Options, db.session))
+admin.add_view(AdminView(UserPolls, db.session))
 
 
 @votr.route('/')
@@ -68,7 +76,7 @@ def login():
         # user wasn't found in the database
         flash('Username or password is incorrect please try again', 'error')
 
-    return redirect(url_for('home'))
+    return redirect(request.args.get('next') or url_for('home'))
 
 
 @votr.route('/logout')
@@ -136,11 +144,25 @@ def api_poll_vote():
     poll_title, option = (poll['poll_title'], poll['option'])
 
     join_tables = Polls.query.join(Topics).join(Options)
+
+    # Get topic and username from the database
+    topic = Topics.query.filter_by(title=poll_title).first()
+    user = Users.query.filter_by(username=session['user']).first()
+
     # filter options
     option = join_tables.filter(Topics.title.like(poll_title)).filter(Options.name.like(option)).first()
 
-    # increment vote_count by 1 if the option was found
+    # check if the user has voted on this poll
+    poll_count = UserPolls.query.filter_by(topic_id=topic.id).filter_by(user_id=user.id).count()
+    if poll_count > 0:
+        return jsonify({'message': 'Sorry! multiple votes are not allowed'})
+
     if option:
+        # record user and poll
+        user_poll = UserPolls(topic_id=topic.id, user_id=user.id)
+        db.session.add(user_poll)
+
+        # increment vote_count by 1 if the option was found
         option.vote_count += 1
         db.session.commit()
 
