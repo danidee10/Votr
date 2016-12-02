@@ -14,6 +14,8 @@ Don't forget to leave a comment when you visit (>‿◠)✌
   - Part 5 - **How to build a simple REST API with Flask**
   - Part 6 - **Connecting React to a REST API**
   - Part 7 - **Spin up an Admin dashboard quickly and easily with Flask-Admin**
+  - Part 8 - **Understanding Flask blueprints**
+  - Part 9 - **Running background tasks with celery**
 
 <br />
 
