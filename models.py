@@ -23,15 +23,20 @@ class Users(Base):
     username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(300))  # incase password hash becomes too long
 
+    def __repr__(self):
+        return self.username
+
 
 # Model for poll topics
 class Topics(Base):
     title = db.Column(db.String(500))
     status = db.Column(db.Boolean, default=1)  # to mark poll as open or closed
     create_uid = db.Column(db.ForeignKey('users.id'))
+    close_date = db.Column(db.DateTime)
 
     created_by = db.relationship('Users', foreign_keys=[create_uid],
-                                 backref=db.backref('user_polls', lazy='dynamic'))
+                                 backref=db.backref('user_polls',
+                                 lazy='dynamic'))
 
     # user friendly way to display the object
     def __repr__(self):
@@ -41,8 +46,10 @@ class Topics(Base):
     def to_json(self):
         return {
                 'title': self.title,
-                'options': [{'name': option.option.name, 'vote_count': option.vote_count}
+                'options': [{'name': option.option.name,
+                            'vote_count': option.vote_count}
                             for option in self.options.all()],
+                'close_date': self.close_date,
                 'status': self.status,
                 'total_vote_count': self.total_vote_count
             }

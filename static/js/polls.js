@@ -1,12 +1,22 @@
 var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
-var browserHistory = ReactRouter.browserHistory;
+var browserHistory = ReactRouter.browserHistory
+try {
+  var SimpleTimePicker = ReactSimpleTimePicker.SimpleTimePicker;
+}catch(err){
+  console.log(err);
+}
 
 // css style to align text to the center of it's container
 var Align = {
   textAlign: 'center',
   fontFamily: 'EB Garamond'
 };
+
+var TimeLeft = {
+  color: '#999',
+  fontSize: '15px'
+}
 
 //global variable to store origin url (e.g http://localhost:5000)
 var origin = window.location.origin;
@@ -15,7 +25,14 @@ var PollForm = React.createClass({
 
   getInitialState: function(e){
     // set initial state of form inputs
-    return {title: '', option: '', options: [], all_options: []}
+
+    // close poll in 24 hours by default
+    var close_date = new Date();
+    close_date.setHours(close_date.getHours() + 24);
+    close_date = close_date.getTime() / 1000;
+
+
+    return {title: '', option: '', options: [], close_date: close_date, all_options: []}
   },
 
   handleTitleChange: function(e){
@@ -35,6 +52,13 @@ var PollForm = React.createClass({
     });
   },
 
+  onDateChange: function(e){
+    // convert date to UTC timestamp in seconds
+    var close_date = e.getTime() / 1000
+
+    this.setState({close_date: close_date})
+  },
+
   componentDidMount: function(){
 
     var url =  origin + '/api/polls/options'
@@ -45,7 +69,6 @@ var PollForm = React.createClass({
       dataType: 'json',
       cache: false,
       success: function(data) {
-        console.log(data);
         this.setState({all_options: data});
       }.bind(this),
       error: function(xhr, status, err) {
@@ -59,8 +82,13 @@ var PollForm = React.createClass({
     e.preventDefault();
     var title = this.state.title;
     var options = this.state.options;
+    var close_date = this.state.close_date;
 
-    var data = {'title': title, options: options.map(function(x){return x.name})};
+    var data = {title: title,
+                options: options.map(function(x){return x.name}),
+                close_date: close_date
+              };
+
     var url =  origin + '/api/polls'
 
     // make post request
@@ -106,6 +134,10 @@ var PollForm = React.createClass({
         <datalist id="option">
           {all_options}
         </datalist>
+
+
+        <SimpleTimePicker days="7" onChange={this.onDateChange} />
+        <br />
 
         <div className="row form-group">
           <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.handleOptionAdd}>Add option</button>
@@ -181,7 +213,10 @@ var LivePreview = React.createClass({
             <form onSubmit={this.voteHandler}>
               {options}
               <br />
-              <button type="submit" disabled={this.state.disabled} className="btn btn-success btn-outline hvr-grow">Vote!</button> <small>{this.props.total_vote_count} votes so far</small>
+              <button type="submit" disabled={this.state.disabled}
+              className="btn btn-success btn-outline hvr-grow">Vote!</button>
+              <small> {this.props.total_vote_count} votes so far</small>
+              <small style={TimeLeft}> | {this.props.close_date}</small>
             </form>
           </div>
         </div>
@@ -219,10 +254,28 @@ var LivePreviewProps = React.createClass({
 
   render: function(){
     var polls = this.props.polls.Polls.map(function(poll){
+
+      var minutes = Math.floor((Date.parse(poll.close_date) - Date.now()) / (60000));
+      var time_remaining = '';
+
+      if(minutes > 1 && minutes < 59){
+        time_remaining += minutes + ' minutes remaining';
+      }
+
+      else if(minutes < 1380){
+        var hours =  Math.floor(minutes / 60);
+        time_remaining += hours + ' hours remaining';
+      }
+
+      else {
+        var days = Math.floor(minutes / (24 * 60));
+        time_remaining += days + ' days remaining';
+      }
+
       return (
         <LivePreview key={poll.title} title={poll.title} options={poll.options}
         total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler}
-        classContext={this.props.classContext} />
+        close_date={time_remaining} classContext={this.props.classContext} />
     );
   }.bind(this));
 

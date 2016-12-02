@@ -8,6 +8,26 @@ from admin import AdminView, TopicView
 # Blueprints
 from api.api import api
 
+# celery factory
+import config
+from celery import Celery
+
+
+def make_celery(app):
+    celery = Celery(app.import_name, broker=config.CELERY_BROKER)
+    celery.conf.update(votr.config)
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+
+    return celery
+
 votr = Flask(__name__)
 
 votr.register_blueprint(api)
@@ -17,9 +37,12 @@ votr.config.from_object('config')
 
 # create the database
 db.init_app(votr)
-db.create_all(app=votr)
+# db.create_all(app=votr)
 
 migrate = Migrate(votr, db, render_as_batch=True)
+
+# create celery object
+celery = make_celery(votr)
 
 admin = Admin(votr, name='Dashboard', index_view=TopicView(Topics, db.session, url='/admin', endpoint='admin'))
 admin.add_view(AdminView(Users, db.session))

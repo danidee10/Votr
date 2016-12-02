@@ -1,7 +1,6 @@
 from models import db, Users, Polls, Topics, Options, UserPolls
 from flask import Blueprint, request, jsonify, session
-
-#import pdb; pdb.set_trace()
+from datetime import datetime
 
 api = Blueprint('api', 'api', url_prefix='/api')
 
@@ -13,7 +12,7 @@ def api_polls():
         # get the poll and save it in the database
         poll = request.get_json()
 
-        # simple validation to check if all values are properly secret
+        # simple validation to check if all values are properly set
         for key, value in poll.items():
             if not value:
                 return jsonify({'message': 'value for {} is empty'.format(key)})
@@ -25,11 +24,16 @@ def api_polls():
                    if options_query(option).count() == 0
                    else Polls(option=options_query(option).first()) for option in poll['options']
                    ]
-
-        new_topic = Topics(title=title, options=options)
+        eta = datetime.utcfromtimestamp(poll['close_date'])
+        new_topic = Topics(title=title, options=options, close_date=eta)
 
         db.session.add(new_topic)
         db.session.commit()
+
+        # run the task
+        from tasks import close_poll
+
+        close_poll.apply_async((new_topic.id,), eta=eta)
 
         return jsonify({'message': 'Poll was created succesfully'})
 
@@ -58,11 +62,15 @@ def api_poll_vote():
     join_tables = Polls.query.join(Topics).join(Options)
 
     # Get topic and username from the database
-    topic = Topics.query.filter_by(title=poll_title).first()
+    topic = Topics.query.filter_by(title=poll_title, status=1).first()
     user = Users.query.filter_by(username=session['user']).first()
 
+    # if poll was closed in the background before user voted
+    if not topic:
+        return jsonify({'message': 'Sorry! this poll has been closed'})
+
     # filter options
-    option = join_tables.filter(Topics.title.like(poll_title)).filter(Options.name.like(option)).first()
+    option = join_tables.filter(Topics.title.like(poll_title), Topics.status == 1).filter(Options.name.like(option)).first()
 
     # check if the user has voted on this poll
     poll_count = UserPolls.query.filter_by(topic_id=topic.id).filter_by(user_id=user.id).count()
