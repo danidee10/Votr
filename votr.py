@@ -14,7 +14,7 @@ from celery import Celery
 
 
 def make_celery(app):
-    celery = Celery(app.import_name, broker=config.CELERY_BROKER)
+    celery = Celery(app.import_name)
     celery.conf.update(votr.config)
     TaskBase = celery.Task
 

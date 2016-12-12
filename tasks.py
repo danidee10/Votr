@@ -1,14 +1,13 @@
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from models import Topics
-import config
 from votr import celery
 
 
-def connect():
+def connect(uri):
     """Connects to the database and return a session"""
 
-    uri = config.SQLALCHEMY_DATABASE_URI
+    uri = uri
 
     # The return value of create_engine() is our connection object
     con = sqlalchemy.create_engine(uri)
@@ -19,11 +18,13 @@ def connect():
 
     return con, session
 
-con, session = connect()
-
 
 @celery.task
-def close_poll(topic_id):
+def close_poll(topic_id, uri):
+    con, session = connect(uri)
+
     topic = session.query(Topics).get(topic_id)
     topic.status = False
     session.commit()
+
+    return 'poll closed succesfully'

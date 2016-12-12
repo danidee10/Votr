@@ -1,6 +1,7 @@
 from models import db, Users, Polls, Topics, Options, UserPolls
 from flask import Blueprint, request, jsonify, session
 from datetime import datetime
+from config import SQLALCHEMY_DATABASE_URI
 
 api = Blueprint('api', 'api', url_prefix='/api')
 
@@ -33,7 +34,7 @@ def api_polls():
         # run the task
         from tasks import close_poll
 
-        close_poll.apply_async((new_topic.id,), eta=eta)
+        close_poll.apply_async((new_topic.id, SQLALCHEMY_DATABASE_URI), eta=eta)
 
         return jsonify({'message': 'Poll was created succesfully'})
 
@@ -93,6 +94,7 @@ def api_poll_vote():
 
 @api.route('/poll/<poll_name>')
 def api_poll(poll_name):
+
     poll = Topics.query.filter(Topics.title.like(poll_name)).first()
 
     return jsonify({'Polls': [poll.to_json()]}) if poll else jsonify({'message': 'poll not found'})
