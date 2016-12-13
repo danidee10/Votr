@@ -16,6 +16,7 @@ Don't forget to leave a comment when you visit (>‿◠)✌
   - Part 7 - **Spin up an Admin dashboard quickly and easily with Flask-Admin**
   - Part 8 - **Understanding Flask blueprints**
   - Part 9 - **Running background tasks with celery**
+  - Part 10 - **Testing the application**
 
 <br />
 

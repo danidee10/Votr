@@ -11,6 +11,7 @@ class Testvotr():
     @classmethod
     def setUpClass(cls):
         votr.config['DEBUG'] = False
+        votr.config['TESTING'] = True
         cls.DB_PATH = os.path.join(os.path.dirname(__file__), 'votr_test.db')
         votr.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(cls.DB_PATH)
         celery.conf.update(CELERY_ALWAYS_EAGER=True)
@@ -24,15 +25,25 @@ class Testvotr():
             cls.p.start()
             time.sleep(2)
 
+        # create new poll
+        poll = {"title": "Flask vs Django",
+                "options": ["Flask", "Django"],
+                "close_date": 1581556683}
+        requests.post(cls.hostname + '/api/polls', json=poll).json()
+
+        # create new admin user
+        signup_data = {'email': 'admin@gmail.com', 'username': 'Administrator',
+                       'password': 'admin'}
+        requests.post(cls.hostname + '/signup', data=signup_data).text
 
     def setUp(self):
         self.poll = {"title": "who's the fastest footballer",
                      "options": ["Hector bellerin", "Gareth Bale", "Arjen robben"],
                      "close_date": 1581556683}
 
-    def test_create_user(self):
-        signup_data = {'email': 'admin@gmail.com', 'username': 'Administrator',
-                       'password': 'admin'}
+    def test_new_user(self):
+        signup_data = {'email': 'user@gmail.com', 'username': 'User',
+                       'password': 'password'}
 
         result = requests.post(self.hostname + '/signup', data=signup_data).text
 
@@ -76,7 +87,7 @@ class Testvotr():
         result = self.vote()
         assert {'message': 'Sorry! multiple votes are not allowed'} == result
 
-    def test_zelery_task(self):
+    def test_celery_task(self):
 
         result = close_poll.apply((1, votr.config['SQLALCHEMY_DATABASE_URI'])).get()
 
