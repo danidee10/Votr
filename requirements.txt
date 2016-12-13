@@ -5,6 +5,8 @@ beautifulsoup4==4.5.1
 billiard==3.5.0.2
 celery==4.0.0
 click==6.6
+codecov==2.0.5
+coverage==4.2
 Flask==0.11.1
 Flask-Admin==1.4.2
 Flask-Migrate==2.0.0
