@@ -4,11 +4,10 @@ python:
   - "3.4"
   - "3.5"
 # Install dependencies
-install:
-  - pip install -r requirements.txt
+install: "pip install -r requirements.txt"
 
 # command to run tests
-script: nosetests -v --with-coverage
+script: nosetests -v
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
