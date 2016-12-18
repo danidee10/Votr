@@ -1,16 +1,27 @@
-from flask import Flask, render_template, request, flash, session, redirect, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, flash, session, redirect
+from flask import url_for, jsonify
 from flask_migrate import Migrate
 from models import db, Users, Polls, Topics, Options, UserPolls
 from flask_admin import Admin
 from admin import AdminView, TopicView
 
+import os
+import json
+import requests
+import config
+
 # Blueprints
 from api.api import api
 
-# celery factory
-import config
+# celery
 from celery import Celery
+
+# Load environment variables
+from dotenv import Dotenv
+try:
+    env = Dotenv('.env')
+except IOError:
+    env = os.environ
 
 
 def make_celery(app):
@@ -37,18 +48,49 @@ votr.config.from_object('config')
 
 # create the database
 db.init_app(votr)
-# db.create_all(app=votr)
+db.create_all(app=votr)
 
 migrate = Migrate(votr, db, render_as_batch=True)
 
 # create celery object
 celery = make_celery(votr)
 
-admin = Admin(votr, name='Dashboard', index_view=TopicView(Topics, db.session, url='/admin', endpoint='admin'))
+admin = Admin(votr, name='Dashboard',
+              index_view=TopicView(Topics, db.session,
+                                   url='/admin', endpoint='admin'))
 admin.add_view(AdminView(Users, db.session))
 admin.add_view(AdminView(Polls, db.session))
 admin.add_view(AdminView(Options, db.session))
 admin.add_view(AdminView(UserPolls, db.session))
+
+
+# Auth0 callback
+@votr.route('/callback')
+def callback_handling():
+    code = request.args.get(config.CODE_KEY)
+    json_header = {config.CONTENT_TYPE_KEY: config.APP_JSON_KEY}
+    token_url = 'https://{auth0_domain}/oauth/token'.format(
+                    auth0_domain=env[config.AUTH0_DOMAIN])
+    token_payload = {
+        config.CLIENT_ID_KEY: env[config.AUTH0_CLIENT_ID],
+        config.CLIENT_SECRET_KEY: env[config.AUTH0_CLIENT_SECRET],
+        config.REDIRECT_URI_KEY: env[config.AUTH0_CALLBACK_URL],
+        config.CODE_KEY: code,
+        config.GRANT_TYPE_KEY: config.AUTHORIZATION_CODE_KEY
+    }
+
+    token_info = requests.post(token_url, data=json.dumps(token_payload),
+                               headers=json_header).json()
+
+    user_url = 'https://{auth0_domain}/userinfo?access_token={access_token}'.\
+        format(auth0_domain=env[config.AUTH0_DOMAIN],
+               access_token=token_info[config.ACCESS_TOKEN_KEY]
+               )
+
+    user_info = requests.get(user_url).json()
+    session[config.PROFILE_KEY] = user_info
+
+    return redirect(url_for('home'))
 
 
 @votr.route('/')
@@ -56,61 +98,24 @@ def home():
     return render_template('index.html')
 
 
-@votr.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
+# Fake Auth to bypass Auth0 and create a session so user can vote
+# The access_token is compared with the app's secret key to
+# prevent anyone from gaining access
+@votr.route('/fake_auth', methods=['POST'])
+def authenticate():
+    data = request.get_json()
 
-        # get the user details from the form
-        email = request.form['email']
-        username = request.form['username']
-        password = request.form['password']
-
-        # hash the password
-        password = generate_password_hash(password)
-
-        user = Users(email=email, username=username, password=password)
-
-        db.session.add(user)
-        db.session.commit()
-
-        flash('Thanks for signing up please login')
-
-        return redirect(url_for('home'))
-
-    # it's a GET request, just render the template
-    return render_template('signup.html')
-
-
-@votr.route('/login', methods=['POST'])
-def login():
-    # we don't need to check the request type as flask will raise a bad request
-    # error if a request aside from POST is made to this url
-
-    username = request.form['username']
-    password = request.form['password']
-
-    # search the database for the User
-    user = Users.query.filter_by(username=username).first()
-
-    if user:
-        password_hash = user.password
-
-        if check_password_hash(password_hash, password):
-            # The hash matches the password in the database log the user in
-            session['user'] = username
-
-            flash('Login was succesfull')
+    if data.get('access_token') == env['SECRET_KEY']:
+        session[config.PROFILE_KEY] = data
+        return jsonify({'message': 'Authenticated'})
     else:
-        # user wasn't found in the database
-        flash('Username or password is incorrect please try again', 'error')
-
-    return redirect(request.args.get('next') or url_for('home'))
+        return jsonify({'message': 'What are you trying to do?'})
 
 
 @votr.route('/logout')
 def logout():
-    if 'user' in session:
-        session.pop('user')
+    if 'profile' in session:
+        session.pop('profile')
 
         flash('We hope to see you again!')
 

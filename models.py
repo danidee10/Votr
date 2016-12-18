@@ -102,10 +102,7 @@ class Polls(Base):
 class UserPolls(Base):
 
     topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_identifier = db.Column(db.String(100))
 
     topics = db.relationship('Topics', foreign_keys=[topic_id],
                              backref=db.backref('voted_on_by', lazy='dynamic'))
-
-    users = db.relationship('Users', foreign_keys=[user_id],
-                            backref=db.backref('voted_on', lazy='dynamic'))

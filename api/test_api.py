@@ -32,30 +32,15 @@ class Testvotr():
         requests.post(cls.hostname + '/api/polls', json=poll).json()
 
         # create new admin user
-        signup_data = {'email': 'admin@gmail.com', 'username': 'Administrator',
-                       'password': 'admin'}
-        requests.post(cls.hostname + '/signup', data=signup_data).text
+        signup_data = {'email': 'admin@gmail.com', 'nickname': 'Testuser',
+                       'email_verified': True, 'access_token': 'development'}
+
+        cls.session.post(cls.hostname + '/fake_auth', json=signup_data)
 
     def setUp(self):
         self.poll = {"title": "who's the fastest footballer",
                      "options": ["Hector bellerin", "Gareth Bale", "Arjen robben"],
                      "close_date": 1581556683}
-
-    def test_new_user(self):
-        signup_data = {'email': 'user@gmail.com', 'username': 'User',
-                       'password': 'password'}
-
-        result = requests.post(self.hostname + '/signup', data=signup_data).text
-
-        assert 'Thanks for signing up please login' in result
-
-    def test_login(self):
-
-        # Login data
-        data = {'username': 'Administrator', 'password': 'admin'}
-        result = self.session.post(self.hostname + '/login', data=data).text
-
-        assert 'Create a poll' in result
 
     def test_empty_option(self):
         result = requests.post(self.hostname + '/api/polls',

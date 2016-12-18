@@ -22,7 +22,8 @@ class AdminView(ModelView):
         return value.strftime('%B-%m-%Y %I:%M:%p')
 
     def is_accessible(self):
-        return session.get('user') == 'Administrator'
+        import pdb; pdb.set_trace()
+        return session.get('profile').get('user_metadata').get('is_admin') == 'yes'
 
     def inaccessible_callback(self, name, **kwargs):
         if not self.is_accessible():

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<title>Votr! - Create polls online</title>
+
+<!-- CSS  -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/materialize.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+<!-- React JS -->
+<script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
+<script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
+<script src="https://npmcdn.com/react-router@2.8.1/umd/ReactRouter.min.js"></script>
+<script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
+<script type="text/babel" src="{{ url_for('static', filename='js/polls.js') }}"></script>
+</head>
+
+<body>
+<nav class="white" role="navigation">
+  <div class="nav-wrapper container">
+    <a id="logo-container" href="{{ url_for('home') }}" class="brand-logo">VOTR</a>
+    <ul class="right hide-on-med-and-down">
+      <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('polls') }}">Polls</a></li>
+      <ul id="dropdown" class="dropdown-content">
+        <li><a href="https://danidee.auth0.com/v2/logout?returnTo=http%3A%2F%2Flocalhost%3A5000%2Flogout">Logout</a></li>
+      </ul>
+
+      {% if session['profile'] %}<li><a class="dropdown-button" data-activates="dropdown" href="#">{{ session['profile']['nickname'] }} <img style="margin-top: 5px;" height="30" src="{{session['profile']['picture'] }}" class="circle" /></a></li>{% endif %}
+    </ul>
+
+    <ul id="nav-mobile" class="side-nav">
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#">Polls</a></li>
+    </ul>
+    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+  </div>
+</nav>
