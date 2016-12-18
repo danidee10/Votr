@@ -1,28 +1,23 @@
 var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
-var browserHistory = ReactRouter.browserHistory;
+var browserHistory = ReactRouter.browserHistory
 
-// css style to align text to the center of it's container
-var Align = {
-  textAlign: 'center',
-  fontFamily: 'EB Garamond'
-};
 
-// css to position progress text inside the progress bar
-var progressText = {
-  position: 'relative',
-  left: '-130px',
-  bottom: '5px',
-  color: '#3c763d'
-};
-
+//global variable to store origin url (e.g http://localhost:5000)
 var origin = window.location.origin;
 
 var PollForm = React.createClass({
 
   getInitialState: function(e){
     // set initial state of form inputs
-    return {title: '', option: '', options: [], all_options: []}
+
+    // close poll in 24 hours by default
+    var close_date = new Date();
+    close_date.setHours(close_date.getHours() + 24);
+    close_date = close_date.getTime() / 1000;
+
+
+    return {title: '', option: '', options: [], close_date: close_date}
   },
 
   handleTitleChange: function(e){
@@ -37,9 +32,16 @@ var PollForm = React.createClass({
   handleOptionAdd: function(e){
     //update poll options and reset options to an empty string
     this.setState({
-    options: this.state.options.concat({name: this.state.option}),
+    options: this.state.options.concat({name: this.Option.value}),
     option: ''
     });
+  },
+
+  onDateChange: function(e){
+    // convert date to UTC timestamp in seconds
+    var close_date = e.getTime() / 1000
+
+    this.setState({close_date: close_date})
   },
 
   componentDidMount: function(){
@@ -51,9 +53,13 @@ var PollForm = React.createClass({
       url: url,
       dataType: 'json',
       cache: false,
-      success: function(data) {
-        console.log(data);
-        this.setState({all_options: data});
+      success: function(options) {
+
+        // Initialize autocomplete form element
+        $('input.autocomplete').autocomplete({
+          data: options
+        });
+
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(url, status, err.toString());
@@ -66,8 +72,13 @@ var PollForm = React.createClass({
     e.preventDefault();
     var title = this.state.title;
     var options = this.state.options;
+    var close_date = this.state.close_date;
 
-    var data = {'title': title, options: options.map(function(x){return x.name})};
+    var data = {title: title,
+                options: options.map(function(x){return x.name}),
+                close_date: close_date
+              };
+
     var url =  origin + '/api/polls'
 
     // make post request
@@ -88,49 +99,43 @@ var PollForm = React.createClass({
 
   render: function(){
 
-    var all_options = this.state.all_options.map(function(option){
-                        return(<option key={option.id} value={option.name} />)
-                      });
-
     return (
-    <div>
-      <form id="poll_form" className="form-signin" onSubmit={this.handleSubmit}>
-        <h2 className="form-signin-heading" style={Align}>Create a poll</h2>
+      <div className="container">
+        <div className="row">
+          <div id="poll" className="card col s5 m5">
+            <form onSubmit={this.handleSubmit}>
+              <h5 className="center">Create a poll</h5>
 
-        <div className="form-group has-success">
-          <label htmlFor="title" className="sr-only">Title</label>
-          <input type="text" id="title" name="title" className="form-control" placeholder="Title" onChange={this.handleTitleChange} required autoFocus />
-        </div>
+              <div className="input-field col s12">
+                <i className="material-icons prefix">mode_edit</i>
+                <input id="title" type="text" onChange={this.handleTitleChange} required />
+                <label htmlFor="title">Title</label>
+              </div>
 
-        <div className="form-group has-success">
-          <label htmlFor="option" className="sr-only">Option</label>
-          <input list="option" className="form-control" placeholder="Option" onChange={this.handleOptionChange}
-          value={this.state.option ? this.state.option: ''} autoFocus />
-        </div>
+              <div className="input-field col s12">
+                <i className="material-icons prefix">speaker_notes</i>
 
-        <datalist id="option">
-          {all_options}
-        </datalist>
+                {/* We're using refs because for some weird reason react doesn't trap the change event triggered by
+                    Materialize css autocomplete's widget, The input is still a controlled componenet
+                    so we can clear the option field once an option is added */}
+                <input id="options" type="text" className="autocomplete" ref={(input) => { this.Option = input; }}
+                onChange={this.handleOptionChange} value={this.state.option} />
+                <label htmlFor="options">Option</label>
+              </div>
 
-        <div className="row form-group">
-          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.handleOptionAdd}>Add option</button>
-          <button className="btn btn-lg btn-success btn-block" type="submit">Save poll</button>
-        </div>
-        <br />
-      </form>
+              <div className="input-field col s12">
+                <button className="waves-effect waves-light btn" type="button" onClick={this.handleOptionAdd}><i className="material-icons left">playlist_add</i>Add option</button>
+                <button className="waves-effect waves-light btn" type="submit"><i className="material-icons left">cloud</i>Save</button>
+              </div>
+              <br />
+            </form>
+          </div>
 
-      <div className="row">
-      <h3 style={Align}>Live Preview</h3>
-
-        {/* Blank column to position LivePreview properly */}
-        <div className="col-sm-4">
-        </div>
-
-        <div className="col-sm-8">
-          <LivePreview title={this.state.title} options={this.state.options} />
+          <div>
+            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s7 m7'} />
+          </div>
         </div>
       </div>
-    </div>
     );
   }
 });
@@ -159,6 +164,14 @@ var LivePreview = React.createClass({
 
   },
 
+  componentDidMount: function(){
+
+    $(document).ready(function(){
+      $('.collapsible').collapsible();
+    });
+
+  },
+
   render: function(){
     var options = this.props.options.map(function(option){
 
@@ -166,36 +179,52 @@ var LivePreview = React.createClass({
 
         // calculate progress bar percentage
         var progress = Math.round((option.vote_count / this.props.total_vote_count) * 100) || 0
+        var current = {width: progress+"%"}
 
         return (
-          <div key={option.name}>
-            <input name="options" type="radio" value={option.name} onChange={this.handleOptionChange} /> {option.name}
-            <br />
-            <progress value={progress} max="100"></progress><small style={progressText}>{progress}%</small>
-            <br />
-          </div>
+
+          <li key={option.name}>
+            <div className="collapsible-header">
+              <p>
+                <input name="options" type="radio" id={option.name} value={option.name} onChange={this.handleOptionChange} />
+                <label htmlFor={option.name}>{option.name}</label>
+              </p>
+              <div className="progress">
+                <div className="determinate" style={current}></div>
+              </div>
+            </div>
+            <div className="collapsible-body"><p>{option.name}</p></div>
+          </li>
         );
       }
     }.bind(this));
 
     return(
-      <div className="col-sm-6">
-        <div className="panel panel-success">
-          <div className="panel-heading">
-            <h4>{this.props.title}</h4>
-          </div>
-          <div className="panel-body">
-            <form onSubmit={this.voteHandler}>
-              {options}
-              <br />
-              <button type="submit" disabled={this.state.disabled} className="btn btn-success btn-outline hvr-grow">Vote!</button> <small>{this.props.total_vote_count} votes so far</small>
-            </form>
-          </div>
-        </div>
-      </div>
-    )
-  }
-});
+
+            <div className={this.props.classContext}>
+              <div className="card blue-grey darken-3">
+                <div className="card-content white-text">
+                  <span className="card-title">{this.props.title}</span>
+
+                  <form onSubmit={this.voteHandler}>
+                    <ul className="collapsible" data-collapsible="accordion">
+                      {options}
+                    </ul>
+
+                    <div className="card-action">
+                      <button type="submit" disabled={this.state.disabled}
+                      className="btn btn-success">Vote!</button>
+                        <span>   </span>
+                        <span className="poll-footer">{this.props.total_vote_count} Votes so far
+                         | {this.props.close_date}</span>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )
+        }
+      });
 
 
 var LivePreviewProps = React.createClass({
@@ -226,13 +255,39 @@ var LivePreviewProps = React.createClass({
 
   render: function(){
     var polls = this.props.polls.Polls.map(function(poll){
+
+      var minutes = Math.floor((Date.parse(poll.close_date) - Date.now()) / (60000));
+      var time_remaining = '';
+
+      if(minutes > 1 && minutes < 59){
+        time_remaining += minutes + ' minutes remaining';
+      }
+
+      else if(minutes < 1380){
+        var hours =  Math.floor(minutes / 60);
+        time_remaining += hours + ' hours remaining';
+      }
+
+      else {
+        var days = Math.floor(minutes / (24 * 60));
+        time_remaining += days + ' days remaining';
+      }
+
       return (
-        <LivePreview key={poll.title} title={poll.title} options={poll.options} total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler} />
+        <LivePreview key={poll.title} title={poll.title} options={poll.options}
+        total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler}
+        close_date={time_remaining} classContext={'col s4 m4'} />
     );
   }.bind(this));
 
     return (
-      <div className="row marketing">{polls}</div>
+          <div className="section">
+            <div className="row">
+              <div className="row">
+                {polls}
+              </div>
+            </div>
+        </div>
     );
   }
 });
@@ -240,11 +295,22 @@ var LivePreviewProps = React.createClass({
 var AllPolls = React.createClass({
 
   getInitialState: function(){
-    return {polls: {'Polls': []}};
+    return {polls: {'Polls': []}, header: ''};
   },
 
   loadPollsFromServer: function(){
-    var url =  origin + '/api/polls'
+
+    // pollName is available as a prop
+    var pollName = this.props.routeParams.pollName
+
+    if(pollName){
+        var url = origin + '/api/poll/' + pollName
+
+    } else {
+        var url = origin + '/api/polls'
+        this.setState({header: 'Latest polls'})
+    }
+
     //make get request
     $.ajax({
       url: url,
@@ -260,77 +326,57 @@ var AllPolls = React.createClass({
   },
 
   componentDidMount: function(){
-    this.loadPollsFromServer()
+    this.loadPollsFromServer();
   },
 
   render: function(){
-    return (
-      <LivePreviewProps polls={this.state.polls} loadPollsFromServer={this.loadPollsFromServer} />
-    );
-  }
 
-});
+    if(this.state.polls.Polls.length != 0){
 
+      // if a message was not returned show the poll
+      if(!this.state.polls.message){
 
-var Poll = React.createClass({
+        return (
+          <LivePreviewProps polls={this.state.polls} loadPollsFromServer={this.loadPollsFromServer}
+          header={this.state.header} />
+          );
 
-  getInitialState: function(){
-    return {poll: {}}
-  },
+      }else{
 
-  voteHandler: function(data){
+        return (
+            <div>
+              <h1>Poll not found</h1>
+              <p>You might be interested in these <a href="/">polls</a></p>
+            </div>
+          );
 
-    var url =  origin + '/api/poll/vote'
-
-    // make patch request
-    $.ajax({
-      url: url,
-      dataType: 'json',
-      type: 'PATCH',
-      data: JSON.stringify(data),
-      contentType: 'application/json; charset=utf-8',
-      success: function(data){
-        alert(data.message);
-        this.setState({selected_option: ''});
-        this.props.loadPollsFromServer();
-      }.bind(this),
-      error: function(xhr, status, err){
-        alert('Poll creation failed: ' + err.toString());
-      }.bind(this)
-    });
-
-  },
-
-
-  componentDidMount: function(){
-    var location = window.location.pathname
-    var url =  origin + '/api/poll' + location
-    //make get request
-    $.ajax({
-      url: url,
-      dataType: 'json',
-      cache: false,
-      success: function(data) {
-        this.setState({poll: data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(url, status, err.toString());
-      }.bind(this)
-    });
-  },
-
-  render: function(){
-    return (
-      <LivePreview key={poll.title} title={this.state.poll.title} options={this.state.poll.options} total_vote_count={this.state.poll.total_vote_count} voteHandler={this.voteHandler} />
-    )}
-
-});
+      }
+    } else {
+        return (
+          <div className="center">
+            <div className="preloader-wrapper small active">
+              <div className="spinner-layer spinner-green-only">
+                <div className="circle-clipper left">
+                  <div className="circle"></div>
+                </div><div className="gap-patch">
+                  <div className="circle"></div>
+                </div><div className="circle-clipper right">
+                  <div className="circle"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+    }
+  });
 
 ReactDOM.render((
   <Router history={browserHistory}>
     <Route path="/" component={AllPolls} />
     <Route path="/polls" component={PollForm} />
+    <Route path="/polls/:pollName" component={AllPolls} />
   </Router>
   ),
-  document.getElementById('container')
+  document.getElementById('polls-container')
 );

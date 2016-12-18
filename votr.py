@@ -1,9 +1,47 @@
-from flask import Flask, render_template, request, flash, session, redirect, url_for, jsonify
+from flask import Flask, render_template, request, flash, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
-from models import db, Users, Polls, Topics, Options
+from models import db, Users, Polls, Topics, Options, UserPolls
+from flask_admin import Admin
+from admin import AdminView, TopicView
+
+import os
+import json
+import requests
+import config
+
+# Blueprints
+from api.api import api
+
+# celery
+from celery import Celery
+
+# Load environment variables
+from dotenv import Dotenv
+try:
+    env = Dotenv('.env')
+except IOError:
+    env = os.environ
+
+
+def make_celery(app):
+    celery = Celery(app.import_name)
+    celery.conf.update(votr.config)
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+
+    return celery
 
 votr = Flask(__name__)
+
+votr.register_blueprint(api)
 
 # load config from the config file we created earlier
 votr.config.from_object('config')
@@ -13,6 +51,44 @@ db.init_app(votr)
 db.create_all(app=votr)
 
 migrate = Migrate(votr, db, render_as_batch=True)
+
+# create celery object
+celery = make_celery(votr)
+
+admin = Admin(votr, name='Dashboard', index_view=TopicView(Topics, db.session, url='/admin', endpoint='admin'))
+admin.add_view(AdminView(Users, db.session))
+admin.add_view(AdminView(Polls, db.session))
+admin.add_view(AdminView(Options, db.session))
+admin.add_view(AdminView(UserPolls, db.session))
+
+
+# Auth0 callback
+@votr.route('/callback')
+def callback_handling():
+    code = request.args.get(config.CODE_KEY)
+    json_header = {config.CONTENT_TYPE_KEY: config.APP_JSON_KEY}
+    token_url = 'https://{auth0_domain}/oauth/token'.format(
+                    auth0_domain=env[config.AUTH0_DOMAIN])
+    token_payload = {
+        config.CLIENT_ID_KEY: env[config.AUTH0_CLIENT_ID],
+        config.CLIENT_SECRET_KEY: env[config.AUTH0_CLIENT_SECRET],
+        config.REDIRECT_URI_KEY: env[config.AUTH0_CALLBACK_URL],
+        config.CODE_KEY: code,
+        config.GRANT_TYPE_KEY: config.AUTHORIZATION_CODE_KEY
+    }
+
+    token_info = requests.post(token_url, data=json.dumps(token_payload),
+                               headers=json_header).json()
+
+    user_url = 'https://{auth0_domain}/userinfo?access_token={access_token}'.\
+        format(auth0_domain=env[config.AUTH0_DOMAIN],
+               access_token=token_info[config.ACCESS_TOKEN_KEY]
+               )
+
+    user_info = requests.get(user_url).json()
+    session[config.PROFILE_KEY] = user_info
+
+    return redirect(url_for('home'))
 
 
 @votr.route('/')
@@ -68,13 +144,13 @@ def login():
         # user wasn't found in the database
         flash('Username or password is incorrect please try again', 'error')
 
-    return redirect(url_for('home'))
+    return redirect(request.args.get('next') or url_for('home'))
 
 
 @votr.route('/logout')
 def logout():
-    if 'user' in session:
-        session.pop('user')
+    if 'profile' in session:
+        session.pop('profile')
 
         flash('We hope to see you again!')
 
@@ -86,73 +162,7 @@ def polls():
     return render_template('polls.html')
 
 
-@votr.route('/api/polls', methods=['GET', 'POST'])
-# retrieves/adds polls from/to the database
-def api_polls():
-    if request.method == 'POST':
-        # get the poll and save it in the database
-        poll = request.get_json()
+@votr.route('/polls/<poll_name>')
+def poll(poll_name):
 
-        # simple validation to check if all values are properly secret
-        for key, value in poll.items():
-            if not value:
-                return jsonify({'message': 'value for {} is empty'.format(key)})
-
-        title = poll['title']
-        options_query = lambda option: Options.query.filter(Options.name.like(option))
-
-        options = [Polls(option=Options(name=option))
-                   if options_query(option).count() == 0
-                   else Polls(option=options_query(option).first()) for option in poll['options']
-                   ]
-
-        new_topic = Topics(title=title, options=options)
-
-        db.session.add(new_topic)
-        db.session.commit()
-
-        return jsonify({'message': 'Poll was created succesfully'})
-
-    else:
-        # it's a GET request, return dict representations of the API
-        polls = Topics.query.filter_by(status=1).join(Polls).order_by(Topics.id.desc()).all()
-        all_polls = {'Polls':  [poll.to_json() for poll in polls]}
-
-        return jsonify(all_polls)
-
-
-@votr.route('/api/polls/options')
-def api_polls_options():
-
-    all_options = [option.to_json() for option in Options.query.all()]
-
-    return jsonify(all_options)
-
-
-@votr.route('/api/poll/vote', methods=['PATCH'])
-def api_poll_vote():
-    poll = request.get_json()
-
-    poll_title, option = (poll['poll_title'], poll['option'])
-
-    join_tables = Polls.query.join(Topics).join(Options)
-    # filter options
-    option = join_tables.filter(Topics.title.like(poll_title)).filter(Options.name.like(option)).first()
-
-    # increment vote_count by 1 if the option was found
-    if option:
-        option.vote_count += 1
-        db.session.commit()
-
-        return jsonify({'message': 'Thank you for voting'})
-
-    return jsonify({'message': 'option or poll was not found please try again'})
-
-
-@votr.route('/poll/<poll_name>')
-def api_poll(poll_name):
-    poll = Topics.query.filter(Topics.title.like(poll_name)).filter_by(status=1).first()
-
-    poll_json = poll.to_json()
-
-    return jsonify(poll_json)
+    return render_template('index.html')

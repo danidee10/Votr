@@ -1,0 +1,126 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+nav ul a,
+nav .brand-logo {
+  color: #444;
+}
+
+p {
+  line-height: 2rem;
+}
+
+.button-collapse {
+  color: #26a69a;
+}
+
+.parallax-container {
+  min-height: 380px;
+  line-height: 0;
+  height: auto;
+  color: rgba(255,255,255,.9);
+}
+  .parallax-container .section {
+    width: 100%;
+  }
+
+@media only screen and (max-width : 992px) {
+  .parallax-container .section {
+    position: absolute;
+    top: 40%;
+  }
+  #index-banner .section {
+    top: 10%;
+  }
+}
+
+@media only screen and (max-width : 600px) {
+  #index-banner .section {
+    top: 0;
+  }
+}
+
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+  font-size: inherit;
+}
+
+footer.page-footer {
+  margin: 0;
+}
+
+
+/*=============== Custom styles=========================*/
+
+html {
+  font-family: 'Dosis', sans-serif;
+  font-size: 17px;
+}
+
+p {
+  font-size: 17px;
+}
+
+@font-face {
+  font-family: 'Hipstelvetica';
+  src: url('../../static/fonts/Hipstelvetica Bold.ttf');
+}
+
+nav .brand-logo {
+  font-family: 'Hipstelvetica';
+  padding-top: 5px;
+}
+
+.jumbotron-column {
+  margin-top: 60px;
+  font-weight: bold;
+}
+
+.parallax {
+  background-color: #272D4E;
+  background-image: url(../images/pattern.png);
+}
+
+nav ul li {
+  font-weight: bold;
+}
+
+.bt-blue {
+  background-color: #272D4E !important;
+}
+
+.bt-blue-text {
+  color: #272D4E !important;
+}
+
+.chat-clients {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+#poll {
+  background-color: #444;
+  color: white;
+  padding-bottom: 20px;
+}
+.github-commit {
+    padding: 14px 0;
+    height: 64px;
+    line-height: 36px;
+    background-color: #4db6ac !important;
+    color: #e6e6e6;
+    font-size: .9rem;
+}
+
+.featured {
+  padding: 3px;
+  height: 60px;
+  width: 220px;
+}

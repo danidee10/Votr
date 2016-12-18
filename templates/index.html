@@ -1,110 +1,207 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% include 'header.html' %}
 
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="http://getbootstrap.com/favicon.ico">
-
-    <title>Votr!</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="{{ url_for("static", filename="css/bootstrap.min.css") }}" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css?family=Cabin" rel="stylesheet">
-
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="{{ url_for("static", filename="css/ie10-viewport-bug-workaround.css") }}" rel="stylesheet">
-
-    <!-- React JS -->
-    <script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
-    <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
-    <script src="https://npmcdn.com/react-router@2.8.1/umd/ReactRouter.min.js"></script>
-    <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
-    <script type="text/babel" src="{{ url_for('static', filename='js/polls.js') }}"></script>
-
-    <!-- Custom styles for this template -->
-    <link href="{{ url_for("static", filename="css/jumbotron-narrow.css") }}" rel="stylesheet">
-
-    <script src="{{ url_for("static", filename="js/ie-emulation-modes-warning.js") }}"></script>
-  </head>
-
-  <body>
-        <nav class="navbar navbar-default navbar-fixed-top">
-          <ul class="nav nav-pills pull-right">
-            {% if session.get('user') %}
-            <li class="welcome-message">Hey {{ session['user']}}!</li>
-              <li role="presentation"><a href="{{ url_for('logout') }}">Logout</a></li>
-            {% endif %}
-            <li role="presentation"><a href="/polls">Polls</a></li>
-            <li role="presentation"><a href="https://github.com/danidee10/Votr">Github</a></li>
-          </ul>
-          <a style="padding-left: 30px;" href="/"><img src="{{ url_for("static", filename="images/logo.png") }}" /></a>
-        </nav>
-
-      <div class="jumbotron">
-        <h1>It's easier with Votr!</h1>
-        <p class="lead">Create free online polls today with Votr</p>
-
-        {% if not session.get('user') %}
-        <p><a class="btn btn-lg btn-success" href="{{ url_for('signup') }}" role="button">Sign up today</a></p>
-        {% else %}
-        <p><a class="btn btn-lg btn-success" href="/polls" role="button">Create a poll</a></p>
-        {% endif %}
-      </div>
-
-      <div class="container">
-
-        <div class="row marketing">
-
-          {% if not session.get('user') %}
-          <div class="col-lg-6">
-            <h3>It's so easy</h3>
-            <p>It's so easy to use Votr, just create an account and you can start
-            creating polls for the world to see!</p>
-          </div>
-
-          <div class="col-lg-6">
-            <h3 class="form-header">Login</h3>
-            <form method="post" action="{{ url_for('login') }}">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                    <p class="{{ category }}">{{ message }}</p>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-              <div class="form-group has-success">
-                <input type="text" class="form-control" name="username" placeholder="Username" />
-              </div>
-
-              <div class="form-group has-success">
-                <input type="password" class="form-control" name="password" placeholder="Password" />
-              </div>
-
-              <button type="submit" name="submit" class="btn btn-success">Submit</button>
-            </form>
-          </div>
-
-          {% else %}
-            <h2 style="text-align: center;">Latest polls</h2>
-            <div id="container" class="row marketing">
-
-            </div>
-          {% endif %}
+<div id="index-banner" class="parallax-container">
+  <div class="section no-pad-bot">
+    <div class="container">
+      <div class="row">
+        <div class="col s6 m6 jumbotron-column">
+          <h5 class="header teal-text text-lighten-2">The #1 way to create polls on the web</h5>
+          <p>Votr is the #1 solution for creating polls and surveys online.</p>
+          <h5 class="header col s12 light"></h5>
+          <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">CREATE YOUR FREE POLL</a>
         </div>
 
+        <div class="row col s6 m6">
+          <h2 style="text-align: center; margin-top: 60px;">Get Feedback On What Your Audience thinks!</h2>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="parallax"></div>
+</div>
+
+<div class="a">
+  <div class="section">
+
+    <h3 class="center bt-blue-text">Much more than polls</h3>
+
+    <!--   Icon Section   -->
+    <div class="row">
+      <div class="col s12 m3">
+        <div class="icon-block">
+          <h2 class="center"><i class="material-icons">lock_outline</i></h2>
+          <h5 class="center">Secure</h5>
+        </div>
       </div>
 
-      <footer class="footer">
-        <p>&copy; 2016 Votr</p>
-      </footer>
+      <div class="col s12 m3">
+        <div class="icon-block">
+          <h2 class="center"><i class="material-icons">thumb_up</i></h2>
+          <h5 class="center">It"s free</h5>
+        </div>
+      </div>
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="{{ url_for("static", filename="js/ie10-viewport-bug-workaround.js") }}"></script>
-  </body>
+      <div class="col s12 m3">
+        <div class="icon-block">
+          <h2 class="center"><i class="material-icons">stay_current_portrait</i></h2>
+          <h5 class="center">Optimized for mobile</h5>
+        </div>
+      </div>
+
+      <div class="col s12 m3">
+        <div class="icon-block">
+          <h2 class="center"><i class="material-icons">question_answer</i></h2>
+          <h5 class="center">Integrated comments</h5>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col s12 m4">
+        <div class="icon-block">
+          <h2 class="center"><i class="material-icons">supervisor_account</i></h2>
+          <h5 class="center">Share on social media</h5>
+        </div>
+      </div>
+
+      <div class="col s12 m4">
+        <div class="icon-block">
+          <h2 class="center"><i class="material-icons">code</i></h2>
+          <h5 class="center">Developer API</h5>
+        </div>
+      </div>
+
+      <div class="col s12 m4">
+        <div class="icon-block">
+          <h2 class="center"><i class="material-icons">trending_up</i></h2>
+          <h5 class="center">Analytics on results</h5>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<div class="parallax-container valign-wrapper">
+  <div class="section no-pad-bot">
+    <div class="container">
+      <div class="row center">
+        <h4 class="header col s12 teal-text text-lighten-2">
+          VOTR Supports popular chat clients, so you never have to leave to run a poll
+        </h4>
+
+        <br />
+
+        <div class="col s12 m4">
+          <img src="{{ url_for('static', filename='images/telegram.png') }}" height="100" alt="telegram" />
+          <br>
+          <p><a class="white-text chat-clients" href="#">Telegram</a></p>
+        </div>
+
+        <div class="col s12 m4">
+          <img src="{{ url_for('static', filename='images/slack.png') }}" height="100" alt="slack" />
+          <br>
+          <p><a class="white-text chat-clients" href="#">Slack</a></p>
+        </div>
+
+        <div class="col s12 m4">
+          <img src="{{ url_for('static', filename='images/skype.png') }}" height="100" alt="Skype" />
+          <br>
+          <p><a class="white-text chat-clients" href="#">Skype</a></p>
+        </div>
+
+        <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SEE HOW</a>
+
+      </div>
+    </div>
+  </div>
+  <div class="parallax"></div>
+</div>
+
+<div class="row">
+  <div class="col S3 m3">
+    <div class="card-panel bt-blue featured">
+      <h5 class="white-text">FEATURED POLLS</h5>
+    </div>
+  </div>
+</div>
+
+<div id="polls-container">
+
+</div>
+
+
+<div class="parallax-container valign-wrapper">
+  <div class="section no-pad-bot">
+    <div class="container">
+      <div class="row center">
+        <h5 class="header col s12 light">What are you waiting for, Sign up now and start creating polls</h5>
+        <!-- Latest patch release (recommended for production) -->
+        <script src="http://cdn.auth0.com/js/lock/10.7.2/lock.min.js"></script>
+        <script>
+          var lock = new Auth0Lock('UxMiM7il9WubZsM7lT5yqqbhY8EE4vwP', 'danidee.auth0.com', {
+            auth: {
+              redirectUrl: 'http://localhost:5000/callback',
+              responseType: 'code',
+              params: {
+                scope: 'openid profile email' // Learn about scopes: https://auth0.com/docs/scopes
+              }
+            }
+          });
+        </script>
+
+        <button onclick="lock.show();" class="btn-large waves-effect waves-light teal lighten-1">Sign up</a>
+      </div>
+    </div>
+  </div>
+  <div class="parallax"><img src="{{ url_for('static', filename='images/background3.jpg') }}" alt="Unsplashed background img 3"></div>
+</div>
+
+<footer class="page-footer teal">
+  <div class="container">
+    <div class="row">
+      <div class="col l6 s12">
+        <h5 class="white-text">About Votr</h5>
+        <p class="grey-text text-lighten-4">
+          Our aim is to make it easy for anyone to create polls and get feedback from their target audience.
+          <br />
+          Votr is still under heavy developement, If you experience any problems using this site or you have any suggestions,
+          don't hesitate to contact us.
+        </p>
+      </div>
+
+      <div class="col l3 s12">
+
+      </div>
+
+      <div class="col l3 s12">
+        <h5 class="white-text">Contact us</h5>
+        <ul>
+          <li><a class="white-text" href="#!">Github</a></li>
+          <li><a class="white-text" href="#!">Twitter</a></li>
+          <li><a class="white-text" href="#!">Email</a></li>
+          <li><a class="white-text" href="#!">Link 4</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-copyright">
+    <div class="container">
+    Votr
+    </div>
+  </div>
+</footer>
+
+
+<!--  Scripts-->
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
+<script src="{{ url_for('static', filename='js/init.js') }}"></script>
+
+</body>
 </html>
