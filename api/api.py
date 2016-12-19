@@ -1,6 +1,16 @@
 from models import db, Polls, Topics, Options, UserPolls
 from flask import Blueprint, request, jsonify, session
 from functools import wraps
+from datetime import datetime
+import os
+
+
+# Load env file
+from dotenv import Dotenv
+try:
+    env = Dotenv('.env')
+except IOError:
+    env = os.environ
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -30,7 +40,7 @@ def api_polls():
         # get the poll and save it in the database
         poll = request.get_json()
 
-        # simple validation to check if all values are properly secret
+        # simple validation to check if all values are properly set
         for key, value in poll.items():
             if not value:
                 return jsonify({'message': 'value for {} is empty'.format(key)})
@@ -42,18 +52,24 @@ def api_polls():
                    if options_query(option).count() == 0
                    else Polls(option=options_query(option).first()) for option in poll['options']
                    ]
-
-        new_topic = Topics(title=title, options=options)
+        eta = datetime.utcfromtimestamp(poll['close_date'])
+        new_topic = Topics(title=title, options=options, close_date=eta)
 
         db.session.add(new_topic)
         db.session.commit()
+
+        # run the task
+        from tasks import close_poll
+
+        close_poll.apply_async((new_topic.id, env['SQLALCHEMY_DATABASE_URI']),
+                               eta=eta)
 
         return jsonify({'message': 'Poll was created succesfully'})
 
     else:
         # it's a GET request, return dict representations of the API
-        polls = Topics.query.filter_by(status=1).\
-                join(Polls).order_by(Topics.id.desc()).all()
+        polls = Topics.query.filter_by(status=True).join(Polls)\
+                .order_by(Topics.id.desc()).all()
 
         all_polls = {'Polls':  [poll.to_json() for poll in polls]}
 
@@ -77,10 +93,13 @@ def api_poll_vote():
 
     join_tables = Polls.query.join(Topics).join(Options)
 
-    # Get topic from the database
-    topic = Topics.query.filter_by(title=poll_title).first()
-
+    # Get topic and username
+    topic = Topics.query.filter_by(title=poll_title, status=True).first()
     user = session['profile'].get('email') or session['profile'].get('nickname')
+
+    # if poll was closed in the background before user voted
+    if not topic:
+        return jsonify({'message': 'Sorry! this poll has been closed'})
 
     # filter options
     option = join_tables.filter(Topics.title.like(poll_title)).filter(Options.name.like(option)).first()

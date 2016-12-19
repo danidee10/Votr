@@ -18,7 +18,7 @@ var PollForm = React.createClass({
 
     // close poll in 24 hours by default
     var close_date = new Date();
-    close_date.setHours(close_date.getHours() + 24);
+    close_date.setHours(close_date.getHours() + 23);
     close_date = close_date.getTime() / 1000;
 
 

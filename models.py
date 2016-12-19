@@ -30,7 +30,7 @@ class Users(Base):
 # Model for poll topics
 class Topics(Base):
     title = db.Column(db.String(500))
-    status = db.Column(db.Boolean, default=1)  # to mark poll as open or closed
+    status = db.Column(db.Boolean, default=True)  # to mark poll as open or closed
     create_uid = db.Column(db.ForeignKey('users.id'))
     close_date = db.Column(db.DateTime)
 
