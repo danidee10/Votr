@@ -1,30 +1,26 @@
 {% include 'header.html' %}
 
-<div id="index-banner" class="parallax-container">
-  <div class="section no-pad-bot">
+<div id="index-banner" class="section no-pad-bot">
     <div class="container">
       <div class="row">
-        <div class="col s6 m6 jumbotron-column">
+        <div class="col s12 m6 jumbotron-column">
           <h5 class="header teal-text text-lighten-2">The #1 way to create polls on the web</h5>
           <p>Votr is the #1 solution for creating polls and surveys online.</p>
           <h5 class="header col s12 light"></h5>
           <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">CREATE YOUR FREE POLL</a>
         </div>
 
-        <div class="row col s6 m6">
+        <div class="row col s12 m6">
           <h2 style="text-align: center; margin-top: 60px;">Get Feedback On What Your Audience thinks!</h2>
         </div>
       </div>
     </div>
-
-  </div>
-  <div class="parallax"></div>
 </div>
 
 <div class="a">
   <div class="section">
 
-    <h3 class="center bt-blue-text">Much more than polls</h3>
+    <h4 class="center bt-blue-text">Much more than polls</h4>
 
     <!--   Icon Section   -->
     <div class="row">
@@ -87,44 +83,39 @@
 </div>
 
 
-<div class="parallax-container valign-wrapper">
-  <div class="section no-pad-bot">
-    <div class="container">
-      <div class="row center">
-        <h4 class="header col s12 teal-text text-lighten-2">
-          VOTR Supports popular chat clients, so you never have to leave to run a poll
-        </h4>
+<div id="index-banner" class="section no-pad-bot">
+    <div class="row center">
+      <h4 class="header col s12 teal-text text-lighten-2">
+        VOTR Supports popular chat clients, so you never have to leave to run a poll
+      </h4>
 
-        <br />
+      <br />
 
-        <div class="col s12 m4">
-          <img src="{{ url_for('static', filename='images/telegram.png') }}" height="100" alt="telegram" />
-          <br>
-          <p><a class="white-text chat-clients" href="#">Telegram</a></p>
-        </div>
-
-        <div class="col s12 m4">
-          <img src="{{ url_for('static', filename='images/slack.png') }}" height="100" alt="slack" />
-          <br>
-          <p><a class="white-text chat-clients" href="#">Slack</a></p>
-        </div>
-
-        <div class="col s12 m4">
-          <img src="{{ url_for('static', filename='images/skype.png') }}" height="100" alt="Skype" />
-          <br>
-          <p><a class="white-text chat-clients" href="#">Skype</a></p>
-        </div>
-
-        <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SEE HOW</a>
-
+      <div class="col s12 m4">
+        <img src="{{ url_for('static', filename='images/telegram.png') }}" height="100" alt="telegram" />
+        <br>
+        <p><a class="white-text chat-clients" href="#">Telegram</a></p>
       </div>
+
+      <div class="col s12 m4">
+        <img src="{{ url_for('static', filename='images/slack.png') }}" height="100" alt="slack" />
+        <br>
+        <p><a class="white-text chat-clients" href="#">Slack</a></p>
+      </div>
+
+      <div class="col s12 m4">
+        <img src="{{ url_for('static', filename='images/skype.png') }}" height="100" alt="Skype" />
+        <br>
+        <p><a class="white-text chat-clients" href="#">Skype</a></p>
+      </div>
+
+      <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SEE HOW</a>
+
     </div>
-  </div>
-  <div class="parallax"></div>
 </div>
 
 <div class="row">
-  <div class="col S3 m3">
+  <div class="col S12 m3">
     <div class="card-panel bt-blue featured">
       <h5 class="white-text">FEATURED POLLS</h5>
     </div>
@@ -182,10 +173,9 @@
       <div class="col l3 s12">
         <h5 class="white-text">Contact us</h5>
         <ul>
-          <li><a class="white-text" href="#!">Github</a></li>
-          <li><a class="white-text" href="#!">Twitter</a></li>
+          <li><a class="white-text" href="https://github.com/danidee10/Votr">Github</a></li>
+          <li><a class="white-text" href="#!">https://twitter.com/osaetindaniel</a></li>
           <li><a class="white-text" href="#!">Email</a></li>
-          <li><a class="white-text" href="#!">Link 4</a></li>
         </ul>
       </div>
     </div>

@@ -99,7 +99,7 @@ var PollForm = React.createClass({
     return (
       <div className="container">
         <div className="row">
-          <div id="poll" className="card col s5 m5">
+          <div id="poll" className="card col s12 m5">
             <form onSubmit={this.handleSubmit}>
               <h5 className="center">Create a poll</h5>
 
@@ -129,7 +129,7 @@ var PollForm = React.createClass({
           </div>
 
           <div>
-            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s7 m7'} />
+            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m7'} />
           </div>
         </div>
       </div>
@@ -278,7 +278,7 @@ var LivePreviewProps = React.createClass({
       return (
         <LivePreview key={poll.title} title={poll.title} options={poll.options}
         total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler}
-        close_date={time_remaining} classContext={'col s4 m4'} />
+        close_date={time_remaining} classContext={'col s12 m4'} />
     );
   }.bind(this));
 
