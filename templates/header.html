@@ -17,6 +17,19 @@
 <script src="https://npmcdn.com/react-router@2.8.1/umd/ReactRouter.min.js"></script>
 <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
 <script type="text/babel" src="{{ url_for('static', filename='js/polls.js') }}"></script>
+
+<script src="http://cdn.auth0.com/js/lock/10.7.2/lock.min.js"></script>
+<script>
+  var lock = new Auth0Lock('Hiv6T72A0eqhq4RXAFXx0FcncXW5xTsD', 'danidee.auth0.com', {
+    auth: {
+      redirectUrl: 'http://localhost:5000/callback',
+      responseType: 'code',
+      params: {
+        scope: 'openid profile email' // Learn about scopes: https://auth0.com/docs/scopes
+      }
+    }
+  });
+</script>
 </head>
 
 <body>
@@ -30,12 +43,27 @@
         <li><a href="https://danidee.auth0.com/v2/logout?returnTo=http%3A%2F%2Flocalhost%3A5000%2Flogout">Logout</a></li>
       </ul>
 
-      {% if session['profile'] %}<li><a class="dropdown-button" data-activates="dropdown" href="#">{{ session['profile']['nickname'] }} <img style="margin-top: 5px;" height="30" src="{{session['profile']['picture'] }}" class="circle" /></a></li>{% endif %}
+      {% if session['profile'] %}<li><a class="dropdown-button" data-activates="dropdown" href="{{ url_for('polls') }}">{{ session['profile']['nickname'] }} <img style="margin-top: 5px;" height="30" src="{{session['profile']['picture'] }}" class="circle" /></a></li>
+
+      {% else %}
+
+      <li><a onclick="lock.show();">Login</a></li>
+
+      {% endif %}
     </ul>
 
     <ul id="nav-mobile" class="side-nav">
-      <li><a href="#">Dashboard</a></li>
-      <li><a href="#">Polls</a></li>
+      <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('polls') }}">Polls</a></li>
+
+      {% if not session['profile'] %}
+      <li><a onclick="lock.show()">Login</a></li>
+      {% else %}
+
+      <li><a href="https://danidee.auth0.com/v2/logout?returnTo=http%3A%2F%2Flocalhost%3A5000%2Flogout">Logout</a></li>
+
+      {% endif %}
+
     </ul>
     <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
   </div>

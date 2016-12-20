@@ -8,6 +8,7 @@
           <p>Votr is the #1 solution for creating polls and surveys online.</p>
           <h5 class="header col s12 light"></h5>
           <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">CREATE YOUR FREE POLL</a>
+          {% if not session['profile'] %}<a onclick="lock.show();" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SIGN UP</a>{% endif %}
         </div>
 
         <div class="row col s12 m6">
@@ -133,18 +134,6 @@
       <div class="row center">
         <h5 class="header col s12 light">What are you waiting for, Sign up now and start creating polls</h5>
         <!-- Latest patch release (recommended for production) -->
-        <script src="http://cdn.auth0.com/js/lock/10.7.2/lock.min.js"></script>
-        <script>
-          var lock = new Auth0Lock('Hiv6T72A0eqhq4RXAFXx0FcncXW5xTsD', 'danidee.auth0.com', {
-            auth: {
-              redirectUrl: 'http://localhost:5000/callback',
-              responseType: 'code',
-              params: {
-                scope: 'openid profile email' // Learn about scopes: https://auth0.com/docs/scopes
-              }
-            }
-          });
-        </script>
 
         <button onclick="lock.show();" class="btn-large waves-effect waves-light teal lighten-1">Sign up</a>
       </div>
@@ -174,7 +163,7 @@
         <h5 class="white-text">Contact us</h5>
         <ul>
           <li><a class="white-text" href="https://github.com/danidee10/Votr">Github</a></li>
-          <li><a class="white-text" href="#!">https://twitter.com/osaetindaniel</a></li>
+          <li><a class="white-text" href="https://twitter.com/osaetindaniel">Twitter</a></li>
           <li><a class="white-text" href="#!">Email</a></li>
         </ul>
       </div>
