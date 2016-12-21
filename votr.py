@@ -6,9 +6,9 @@ from flask_admin import Admin
 from admin import AdminView, TopicView
 
 import os
-import json
-import requests
 import config
+import jwt
+from jwt.excpetions import DecodeError, InvalidAudienceError
 
 # Blueprints
 from api.api import api
@@ -86,52 +86,34 @@ def init_rollbar():
     got_request_exception.connect(rollbar.contrib.flask.report_exception, votr)
 
 
-# Auth0 callback
-@votr.route('/callback')
-def callback_handling():
-    code = request.args.get(config.CODE_KEY)
-    json_header = {config.CONTENT_TYPE_KEY: config.APP_JSON_KEY}
-    token_url = 'https://{auth0_domain}/oauth/token'.format(
-                    auth0_domain=env[config.AUTH0_DOMAIN])
-    token_payload = {
-        config.CLIENT_ID_KEY: env[config.AUTH0_CLIENT_ID],
-        config.CLIENT_SECRET_KEY: env[config.AUTH0_CLIENT_SECRET],
-        config.REDIRECT_URI_KEY: env[config.AUTH0_CALLBACK_URL],
-        config.CODE_KEY: code,
-        config.GRANT_TYPE_KEY: config.AUTHORIZATION_CODE_KEY
-    }
-
-    token_info = requests.post(token_url, data=json.dumps(token_payload),
-                               headers=json_header).json()
-
-    user_url = 'https://{auth0_domain}/userinfo?access_token={access_token}'.\
-        format(auth0_domain=env[config.AUTH0_DOMAIN],
-               access_token=token_info[config.ACCESS_TOKEN_KEY]
-               )
-
-    user_info = requests.get(user_url).json()
-    session[config.PROFILE_KEY] = user_info
-
-    return redirect(url_for('home'))
-
-
 @votr.route('/')
 def home():
+
     return render_template('index.html')
 
 
-# Fake Auth to bypass Auth0 and create a session so user can vote
-# The access_token is compared with the app's secret key to
-# prevent anyone from gaining access
-@votr.route('/fake_auth', methods=['POST'])
-def authenticate():
-    data = request.get_json()
+@votr.route('/login', methods=['POST'])
+def login():
+    token = request.get_json()
 
-    if data.get('access_token') == env['SECRET_KEY']:
+    if token:
+        id_token = token.get('id_token')
+
+        # validate the JWT and create a new session if valid
+        try:
+            data = jwt.decode(id_token, env[config.AUTH0_CLIENT_SECRET],
+                              audience=env[config.AUTH0_CLIENT_ID],
+                              algorithms=['HS256'])
+
+        except (DecodeError, InvalidAudienceError) as e:
+            return jsonify({'message':
+                            'Login failed: Incorrect or expired token'})
+
         session[config.PROFILE_KEY] = data
-        return jsonify({'message': 'Authenticated'})
-    else:
-        return jsonify({'message': 'What are you trying to do?'})
+
+        return jsonify({'message': 'Login succesfull'})
+
+    return jsonify({'message': 'No token was supplied'})
 
 
 @votr.route('/logout')
@@ -139,7 +121,7 @@ def logout():
     if 'profile' in session:
         session.pop('profile')
 
-        flash('We hope to see you again!')
+        flash('Thanks for using Votr!, We hope to see you soon')
 
     return redirect(url_for('home'))
 

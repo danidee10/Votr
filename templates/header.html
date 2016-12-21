@@ -22,13 +22,42 @@
 <script>
   var lock = new Auth0Lock('Hiv6T72A0eqhq4RXAFXx0FcncXW5xTsD', 'danidee.auth0.com', {
     auth: {
-      redirectUrl: 'http://localhost:5000/callback',
-      responseType: 'code',
+      responseType: 'id_token',
       params: {
         scope: 'openid profile email' // Learn about scopes: https://auth0.com/docs/scopes
       }
     }
   });
+
+  lock.on("authenticated", function(authResult) {
+    lock.getProfile(authResult.idToken, function(error, profile) {
+      if (error) {
+        // Handle error
+        return;
+      }
+
+      localStorage.setItem('id_token', authResult.idToken);
+
+      url = 'http://localhost:5000/login'
+      data = {'id_token': authResult.idToken}
+
+      // Log the user in and redirect if succesfull
+      $.ajax({
+        url: url,
+        dataType: 'json',
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        success: function(data){
+          Materialize.toast(data.message, 5000);
+          window.location.href = 'http://localhost:5000'
+        }.bind(this),
+        error: function(xhr, status, err){
+          Materialize.toast('Login failed: ' + err.toString(), 5000);
+        }.bind(this)
+      });
+    })
+    });
 </script>
 </head>
 
