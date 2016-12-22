@@ -5,6 +5,23 @@ import os
 import time
 from tasks import close_poll
 
+import jwt
+import config
+
+# Load env file
+from dotenv import Dotenv
+try:
+    env = Dotenv('.env')
+except IOError:
+    env = os.environ
+
+
+# helper to generate JWT's
+def generate_token(payload):
+    token = jwt.encode(payload, env[config.AUTH0_CLIENT_SECRET],
+                       algorithm='HS256').decode()
+    return token
+
 
 class Testvotr():
 
@@ -13,10 +30,10 @@ class Testvotr():
         votr.config['DEBUG'] = False
         votr.config['TESTING'] = True
         cls.DB_PATH = os.path.join(os.path.dirname(__file__), 'votr_test.db')
-        votr.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(cls.DB_PATH)
+        votr.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.\
+            format(cls.DB_PATH)
         celery.conf.update(CELERY_ALWAYS_EAGER=True)
         cls.hostname = 'http://localhost:7000'
-        cls.session = requests.Session()
 
         with votr.app_context():
             db.init_app(votr)
@@ -31,15 +48,16 @@ class Testvotr():
                 "close_date": 1581556683}
         requests.post(cls.hostname + '/api/polls', json=poll).json()
 
-        # create new admin user
-        signup_data = {'email': 'admin@gmail.com', 'nickname': 'Testuser',
-                       'email_verified': True, 'access_token': 'development'}
+        # There is no need to test Auth0's auth so let's create a JWT
+        payload = {'email_verified': True, 'email': 'admin@gmail.com',
+                   'aud': env[config.AUTH0_CLIENT_ID]}
 
-        cls.session.post(cls.hostname + '/fake_auth', json=signup_data)
+        cls.verified_jwt = generate_token(payload)
 
     def setUp(self):
         self.poll = {"title": "who's the fastest footballer",
-                     "options": ["Hector bellerin", "Gareth Bale", "Arjen robben"],
+                     "options": ["Hector bellerin", "Gareth Bale",
+                                 "Arjen robben"],
                      "close_date": 1581556683}
 
     def test_empty_option(self):
@@ -55,28 +73,42 @@ class Testvotr():
         assert {'message': 'value for title is empty'} == result
 
     def test_new_poll(self):
-        result = requests.post(self.hostname + '/api/polls', json=self.poll).json()
+        result = requests.post(self.hostname + '/api/polls',
+                               json=self.poll).json()
         assert {'message': 'Poll was created succesfully'} == result
 
-    def vote(self):
-        result = self.session.patch(self.hostname + '/api/poll/vote',
-                                    json={'poll_title': self.poll['title'],
-                                          'option': self.poll['options'][0]}).json()
+    def vote(self, jwt):
+        headers = {'Authorization': 'Bearer ' + jwt}
+        result = requests.patch(self.hostname + '/api/poll/vote',
+                                json={'poll_title': self.poll['title'],
+                                      'option': self.poll['options'][0]},
+                                headers=headers).json()
         return result
 
     def test_voting(self):
-        result = self.vote()
+        result = self.vote(self.verified_jwt)
         assert {'message': 'Thank you for voting'} == result
 
     def test_voting_twice(self):
-        result = self.vote()
-        assert {'message': 'Sorry! multiple votes are not allowed'} == result
+        result = self.vote(self.verified_jwt)
+        assert {'message':
+                'Multiple votes are not allowed on this poll'} == result
+
+    def test_not_verified_voter(self):
+        # Generate a JWT for a user that hasn't verified their email
+        payload = {'email_verified': False, 'email': 'example@gmail.com',
+                   'aud': env[config.AUTH0_CLIENT_ID]}
+        unverified_jwt = generate_token(payload)
+        result = self.vote(unverified_jwt)
+
+        assert {'message':
+                'You have to verify your email before you vote'} == result
 
     def test_celery_task(self):
 
-        result = close_poll.apply((1, votr.config['SQLALCHEMY_DATABASE_URI'])).get()
+        result = close_poll.apply((1, votr.config['SQLALCHEMY_DATABASE_URI']))
 
-        assert 'poll closed succesfully' == result
+        assert 'poll closed succesfully' == result.get()
 
     @classmethod
     def tearDownClass(cls):

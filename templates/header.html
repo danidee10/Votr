@@ -20,44 +20,22 @@
 
 <script src="http://cdn.auth0.com/js/lock/10.7.2/lock.min.js"></script>
 <script>
+  var base_url = window.location
+
   var lock = new Auth0Lock('Hiv6T72A0eqhq4RXAFXx0FcncXW5xTsD', 'danidee.auth0.com', {
     auth: {
-      responseType: 'id_token',
+      responseType: 'code',
+      redirectUrl: base_url + 'callback',
       params: {
-        scope: 'openid profile email' // Learn about scopes: https://auth0.com/docs/scopes
+        scope: 'openid profile picture email' // Learn about scopes: https://auth0.com/docs/scopes
       }
     }
   });
 
-  lock.on("authenticated", function(authResult) {
-    lock.getProfile(authResult.idToken, function(error, profile) {
-      if (error) {
-        // Handle error
-        return;
-      }
-
-      localStorage.setItem('id_token', authResult.idToken);
-
-      url = 'http://localhost:5000/login'
-      data = {'id_token': authResult.idToken}
-
-      // Log the user in and redirect if succesfull
-      $.ajax({
-        url: url,
-        dataType: 'json',
-        type: 'POST',
-        data: JSON.stringify(data),
-        contentType: 'application/json; charset=utf-8',
-        success: function(data){
-          Materialize.toast(data.message, 5000);
-          window.location.href = 'http://localhost:5000'
-        }.bind(this),
-        error: function(xhr, status, err){
-          Materialize.toast('Login failed: ' + err.toString(), 5000);
-        }.bind(this)
-      });
-    })
-    });
+  {% if id_token %}
+    // save the JWT if the token is set
+    localStorage.setItem('id_token', '{{ id_token }}');
+  {% endif %}
 </script>
 </head>
 
@@ -69,7 +47,7 @@
       <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
       <li><a href="{{ url_for('polls') }}">Polls</a></li>
       <ul id="dropdown" class="dropdown-content">
-        <li><a href="https://danidee.auth0.com/v2/logout?returnTo=http%3A%2F%2Flocalhost%3A5000%2Flogout">Logout</a></li>
+        <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Logout</a></li>
       </ul>
 
       {% if session['profile'] %}<li><a class="dropdown-button" data-activates="dropdown" href="{{ url_for('polls') }}">{{ session['profile']['nickname'] }} <img style="margin-top: 5px;" height="30" src="{{session['profile']['picture'] }}" class="circle" /></a></li>
@@ -89,7 +67,7 @@
       <li><a onclick="lock.show()">Login</a></li>
       {% else %}
 
-      <li><a href="https://danidee.auth0.com/v2/logout?returnTo=http%3A%2F%2Flocalhost%3A5000%2Flogout">Logout</a></li>
+      <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Logout</a></li>
 
       {% endif %}
 

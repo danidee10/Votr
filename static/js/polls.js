@@ -229,6 +229,7 @@ var LivePreviewProps = React.createClass({
   voteHandler: function(data){
 
     var url =  origin + '/api/poll/vote'
+    console.log(localStorage.getItem('id_token'))
 
     // make patch request
     $.ajax({
@@ -236,6 +237,7 @@ var LivePreviewProps = React.createClass({
       dataType: 'json',
       type: 'PATCH',
       data: JSON.stringify(data),
+      headers: {"Authorization": "Bearer " + localStorage.getItem('id_token')},
       contentType: 'application/json; charset=utf-8',
       success: function(data){
 

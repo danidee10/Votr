@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, flash, session, redirect
-from flask import url_for, jsonify
+from flask import url_for
 from flask_migrate import Migrate
 from models import db, Users, Polls, Topics, Options, UserPolls
 from flask_admin import Admin
@@ -8,7 +8,7 @@ from admin import AdminView, TopicView
 import os
 import config
 import jwt
-from jwt.excpetions import DecodeError, InvalidAudienceError
+import requests
 
 # Blueprints
 from api.api import api
@@ -88,32 +88,45 @@ def init_rollbar():
 
 @votr.route('/')
 def home():
+    id_token = request.args.get('id_token')
 
-    return render_template('index.html')
+    logout_url = request.url_root + 'logout'
+
+    return render_template('index.html', id_token=id_token,
+                           logout_url=logout_url)
 
 
-@votr.route('/login', methods=['POST'])
-def login():
-    token = request.get_json()
+@votr.route('/callback')
+def callback_handling():
+    code = request.args.get(config.CODE_KEY)
+    json_header = {config.CONTENT_TYPE_KEY: config.APP_JSON_KEY}
+    token_url = 'https://{auth0_domain}/oauth/token'.format(
+                    auth0_domain=env[config.AUTH0_DOMAIN])
+    token_payload = {
+        config.CLIENT_ID_KEY: env[config.AUTH0_CLIENT_ID],
+        config.CLIENT_SECRET_KEY: env[config.AUTH0_CLIENT_SECRET],
+        config.REDIRECT_URI_KEY: env[config.AUTH0_CALLBACK_URL],
+        config.CODE_KEY: code,
+        config.GRANT_TYPE_KEY: config.AUTHORIZATION_CODE_KEY
+    }
 
-    if token:
-        id_token = token.get('id_token')
+    token_info = requests.post(token_url, json=token_payload,
+                               headers=json_header).json()
+    id_token = token_info['id_token']
 
-        # validate the JWT and create a new session if valid
-        try:
-            data = jwt.decode(id_token, env[config.AUTH0_CLIENT_SECRET],
-                              audience=env[config.AUTH0_CLIENT_ID],
-                              algorithms=['HS256'])
+    user_info = decode_jwt(id_token)
 
-        except (DecodeError, InvalidAudienceError) as e:
-            return jsonify({'message':
-                            'Login failed: Incorrect or expired token'})
+    session[config.PROFILE_KEY] = user_info
 
-        session[config.PROFILE_KEY] = data
+    return redirect(url_for('home', id_token=id_token))
 
-        return jsonify({'message': 'Login succesfull'})
 
-    return jsonify({'message': 'No token was supplied'})
+def decode_jwt(token):
+    user_info = jwt.decode(token, env[config.AUTH0_CLIENT_SECRET],
+                           audience=env[config.AUTH0_CLIENT_ID],
+                           algorithms=['HS256'])
+
+    return user_info
 
 
 @votr.route('/logout')
