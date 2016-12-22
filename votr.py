@@ -124,7 +124,8 @@ def callback_handling():
 def decode_jwt(token):
     user_info = jwt.decode(token, env[config.AUTH0_CLIENT_SECRET],
                            audience=env[config.AUTH0_CLIENT_ID],
-                           algorithms=['HS256'])
+                           algorithms=['HS256'],
+                           options={'verify_iat': False})
 
     return user_info
 
