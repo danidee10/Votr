@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="static/css/style.css"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 <title>Votr! - Create polls online</title>
 
 <!-- CSS  -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
 <link href="{{ url_for('static', filename='css/materialize.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
 <link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
 
@@ -20,15 +21,27 @@
 </head>
 
 <body>
-<nav class="white" role="navigation">
+<nav class=".deep-orange.accent-1" role="navigation">
   <div class="nav-wrapper container">
     <a id="logo-container" href="{{ url_for('home') }}" class="brand-logo">VOTR</a>
     <ul class="right hide-on-med-and-down">
+          <li>
+          <form>
+        <div class="input-field">
+          <input id="search" type="search" placeholder="Search a poll" required>
+          <label for="search"><i class="material-icons">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+      </form>
       <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
       <li><a href="{{ url_for('polls') }}">Polls</a></li>
+      <li><a href="{{ url_for('polls') }}">How it works</a></li>
+      <li><a href="{{ url_for('polls') }}">Featured Polls</a></li>
+      </li>
       <ul id="dropdown" class="dropdown-content">
         <li><a href="https://danidee.auth0.com/v2/logout?returnTo=http%3A%2F%2Flocalhost%3A5000%2Flogout">Logout</a></li>
       </ul>
+
 
       {% if session['profile'] %}<li><a class="dropdown-button" data-activates="dropdown" href="#">{{ session['profile']['nickname'] }} <img style="margin-top: 5px;" height="30" src="{{session['profile']['picture'] }}" class="circle" /></a></li>{% endif %}
     </ul>

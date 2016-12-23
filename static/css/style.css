@@ -74,12 +74,12 @@ p {
 }
 
 nav .brand-logo {
-  font-family: 'Hipstelvetica';
+font-family: 'PT Sans', sans-serif;
   padding-top: 5px;
 }
 
 .jumbotron-column {
-  margin-top: 60px;
+  margin-top: 500px;
   font-weight: bold;
 }
 
@@ -88,6 +88,16 @@ nav .brand-logo {
   background-color: #272D4E;
   background-image: url(../images/pattern.png);
   padding-bottom: 40px;
+  height: 820px;
+  font-size: 10px;
+}
+#index-banner-small {
+  color: #ffffff;
+  background-color: #272D4E;
+  background-image: url(../images/pattern.png);
+  padding-top: 160px;
+  height: 500px;
+  font-size: 10px;
 }
 
 nav ul li {
@@ -125,4 +135,40 @@ nav ul li {
   padding: 3px;
   height: 60px;
   width: 220px;
+}
+
+#search {
+      width:550px;
+}
+
+#cta {
+  text-align: center;
+  margin-top: 500px;
+  font-size: 50px;
+}
+
+.icon-pink {
+    color: #e91e63;
+}
+
+.icon-red {
+      color: #f44336;
+
+}
+
+.icon-indigo {
+      color: #3f51b5;
+
+}
+
+.icon-lgreen {
+  color: #8bc34a;
+}
+
+.icon-test{
+    color: #3e2723;
+}
+.icon-yellow {
+    color: #ffd600;
+
 }
