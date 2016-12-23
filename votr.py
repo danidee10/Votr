@@ -89,11 +89,15 @@ def init_rollbar():
 @votr.route('/')
 def home():
     id_token = request.args.get('id_token')
+    email = request.args.get('email')
+    email_verified = request.args.get('email_verified')
 
     logout_url = request.url_root + 'logout'
 
-    return render_template('index.html', id_token=id_token,
-                           logout_url=logout_url)
+    params = {'id_token': id_token, 'email': email,
+              'email_verified': email_verified, 'logout_url': logout_url}
+
+    return render_template('index.html', **params)
 
 
 @votr.route('/callback')
@@ -116,9 +120,20 @@ def callback_handling():
 
     user_info = decode_jwt(id_token)
 
+    if not user_info.get('email'):
+        dialog_message = "We could not get your email address from {} ."\
+            "Please create an Email/Password account "\
+            "or try another social signup.".\
+            format(user_info['identities'][0]['provider'].capitalize())
+
+        return render_template('index.html', dialog_message=dialog_message)
+
+    email_verified = user_info.get('email_verified', False)
+    email = user_info.get('email')
     session[config.PROFILE_KEY] = user_info
 
-    return redirect(url_for('home', id_token=id_token))
+    return redirect(url_for('home', id_token=id_token, email=email,
+                            email_verified=email_verified))
 
 
 def decode_jwt(token):

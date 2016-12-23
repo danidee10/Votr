@@ -1,5 +1,6 @@
 {% include 'header.html' %}
 
+
 <div id="index-banner" class="section no-pad-bot">
     <div class="container">
       <div class="row">
@@ -181,6 +182,21 @@
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
 <script src="{{ url_for('static', filename='js/init.js') }}"></script>
+<script>
+  var email_verified = '{{ email_verified }}';
+  var dialog_message = "{{ dialog_message }}"
+
+  if(email_verified == 'False'){
+    swal('Almost there!', 'Please check your inbox ({{ email }}) and verify your account', 'success')
+  }
+
+  console.log(dialog_message)
+
+  // if dialog message is not 'None' or 'False'
+  if(dialog_message.length > 5){
+    swal("Oops!", '{{ dialog_message }}', 'error')
+  }
+</script>
 
 </body>
 </html>
