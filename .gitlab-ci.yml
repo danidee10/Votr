@@ -26,7 +26,7 @@ deploy_to_production:
   image: python:3.5
   script:
     - echo "Deploy to staging server\n"
-    - rsync -avz -e 'ssh ubuntu@52.37.191.68' /builds/danidee/Votr --recursive --exclude="*.env" ~/Votr
+    - rsync -avz -e 'ssh' /builds/danidee/Votr --recursive --exclude="*.env" ubuntu@52.37.191.68:/home/ubuntu
   environment:
     name: staging
   only:
