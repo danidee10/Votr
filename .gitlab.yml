@@ -1,0 +1,31 @@
+image: python:3.5
+before_script:
+# install ssh-agent
+- 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+# run ssh-agent
+- eval $(ssh-agent -s)
+# add ssh key stored in SSH_KEY variable to the agent store
+- ssh-add <(echo "$SSH_KEY")
+- mkdir -p ~/.ssh
+- echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+stages:
+  - test
+  - deploy
+test:
+  stage: test
+  script:
+    - echo "Running tests\n"
+    - pip install -r requirements.txt
+    - nostests -vd
+    - bash <(curl -s https://codecov.io/bash)
+
+deploy_to_production:
+  stage: deploy
+  image: python:3.5
+  script:
+    - echo "Deploy to staging server\n"
+    - rsync -avz -e 'ssh ubuntu@52.37.191.68' --recursive --exclude="*.env" ~/Votr
+  environment:
+    name: staging
+  only:
+  - master
