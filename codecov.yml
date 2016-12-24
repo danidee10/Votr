@@ -1,4 +1,5 @@
 codecov:
+  token: 9df70ee5-2999-413c-9a7c-82c193f0334b
   branch: master,development
 
 coverage:
