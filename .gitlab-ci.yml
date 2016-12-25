@@ -1,15 +1,4 @@
 image: python:3.5
-before_script:
-# install rsync
-- 'which rsync || ( apt-get update -y && apt-get install -y rsync )'
-# install ssh-agent
-- 'which ssh-agent || ( apt-get install openssh-client -y )'
-# run ssh-agent
-- eval $(ssh-agent -s)
-# add ssh key stored in SSH_KEY variable to the agent store
-- ssh-add <(echo "$SSH_KEY")
-- mkdir -p ~/.ssh
-- echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 stages:
   - test
   - deploy
@@ -25,9 +14,20 @@ deploy_to_production:
   stage: deploy
   image: python:3.5
   script:
+    # install rsync
+    - 'which rsync || ( apt-get update -y && apt-get install -y rsync )'
+    # install ssh-agent
+    - 'which ssh-agent || ( apt-get install openssh-client -y )'
+    # run ssh-agent
+    - eval $(ssh-agent -s)
+    # add ssh key stored in SSH_KEY variable to the agent store
+    - ssh-add <(echo "$SSH_KEY")
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - echo "Deploy to staging server\n"
     - rsync -avz -e 'ssh' /builds/danidee/Votr --recursive --exclude="*.env" ubuntu@52.37.191.68:/home/ubuntu
+    - ssh ubuntu@52.37.191.68 'sudo service uwsgi restart'
   environment:
-    name: staging
+    name: production
   only:
   - master
