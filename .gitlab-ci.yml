@@ -1,18 +1,29 @@
-image: python:3.5
 stages:
-  - test
+  - test2.7
+  - test3.5
   - deploy
-test:
-  stage: test
+
+test2.7:
+  stage: test2.7
+  image: python:2.7
   script:
-    - echo "Running tests\n"
+    - echo "Running tests on Python 2.7\n"
+    - pip install -r requirements.txt
+    - nosetests -vd --with-coverage
+    - bash <(curl -s https://codecov.io/bash)
+
+test3.5:
+  stage: test3.5
+  image: python:3.5
+  script:
+    - echo "Running tests on Python 3.5\n"
     - pip install -r requirements.txt
     - nosetests -vd --with-coverage
     - bash <(curl -s https://codecov.io/bash)
 
 deploy_to_production:
   stage: deploy
-  image: python:3.5
+  image: ubuntu:14.04
   script:
     # install rsync
     - 'which rsync || ( apt-get update -y && apt-get install -y rsync )'
@@ -31,3 +42,4 @@ deploy_to_production:
     name: production
   only:
   - master
+  when: manual
