@@ -128,7 +128,7 @@ var PollForm = React.createClass({
             </form>
           </div>
 
-          <div>
+          <div className="center">
             <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m7'} />
           </div>
         </div>
@@ -280,7 +280,7 @@ var LivePreviewProps = React.createClass({
       return (
         <LivePreview key={poll.title} title={poll.title} options={poll.options}
         total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler}
-        close_date={time_remaining} classContext={'col s12 m4'} />
+        close_date={time_remaining} classContext={this.props.classContext} />
     );
   }.bind(this));
 
@@ -299,16 +299,17 @@ var LivePreviewProps = React.createClass({
 var AllPolls = React.createClass({
 
   getInitialState: function(){
-    return {polls: {'Polls': []}, header: ''};
+    // pollName is available as a prop
+    this.pollName = this.props.routeParams.pollName
+
+    this.classContext = this.pollName ? 'col s12 m4 offset-m4' : 'col 12 m4'
+    return {polls: {'Polls': []}, header: '', loading: true};
   },
 
   loadPollsFromServer: function(){
 
-    // pollName is available as a prop
-    var pollName = this.props.routeParams.pollName
-
-    if(pollName){
-        var url = origin + '/api/poll/' + pollName
+    if(this.pollName){
+        var url = origin + '/api/poll/' + this.pollName
 
     } else {
         var url = origin + '/api/polls'
@@ -321,7 +322,7 @@ var AllPolls = React.createClass({
       dataType: 'json',
       cache: false,
       success: function(data) {
-        this.setState({polls: data});
+        this.setState({polls: data, loading: false});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(url, status, err.toString());
@@ -335,22 +336,22 @@ var AllPolls = React.createClass({
 
   render: function(){
 
-    if(this.state.polls.Polls.length != 0){
+    if(!this.state.loading){
 
       // if a message was not returned show the poll
       if(!this.state.polls.message){
 
         return (
           <LivePreviewProps polls={this.state.polls} loadPollsFromServer={this.loadPollsFromServer}
-          header={this.state.header} />
+          header={this.state.header} classContext={this.classContext} />
           );
 
       }else{
 
         return (
-            <div>
-              <h1>Poll not found</h1>
-              <p>You might be interested in these <a href="/">polls</a></p>
+            <div className="center">
+              <h1 className="red-text">Poll not found</h1>
+              <p>The poll may have closed, or you don't have the right link</p>
             </div>
           );
 

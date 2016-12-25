@@ -163,4 +163,4 @@ def polls():
 @votr.route('/polls/<poll_name>')
 def poll(poll_name):
 
-    return render_template('index.html')
+    return render_template('polls.html')
