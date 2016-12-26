@@ -10,6 +10,8 @@ test2.7:
     - pip install -r requirements.txt
     - nosetests -vd --with-coverage
     - bash <(curl -s https://codecov.io/bash)
+  only:
+  - development
 
 test3.5:
   stage: runtests
@@ -19,6 +21,8 @@ test3.5:
     - pip install -r requirements.txt
     - nosetests -vd --with-coverage
     - bash <(curl -s https://codecov.io/bash)
+  only:
+  - development
 
 deploy_to_production:
   stage: deploy
