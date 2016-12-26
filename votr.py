@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, session, redirect
+from flask import Flask, render_template, request, flash, session, redirect,g
 from flask import url_for
 from flask_migrate import Migrate
 from models import db, Users, Polls, Topics, Options, UserPolls
@@ -85,11 +85,16 @@ def init_rollbar():
     # send exceptions from `app` to rollbar, using flask's signal system.
     got_request_exception.connect(rollbar.contrib.flask.report_exception, votr)
 
+    @votr.before_request
+    def init_template_variables():
+        # make rollbar token available in template
+        g.rollbar_token = env['ROLLBAR_TOKEN']
+
 
 @votr.route('/')
 def home():
-    id_token = request.args.get('id_token')
-    email = request.args.get('email')
+    id_token = session.get('id_token')
+    email = session.get('email')
     email_verified = request.args.get('email_verified')
 
     logout_url = request.url_root + 'logout'
@@ -128,12 +133,15 @@ def callback_handling():
 
         return render_template('index.html', dialog_message=dialog_message)
 
-    email_verified = user_info.get('email_verified', False)
     email = user_info.get('email')
-    session[config.PROFILE_KEY] = user_info
+    email_verified = user_info.get('email_verified', False)
 
-    return redirect(url_for('home', id_token=id_token, email=email,
-                            email_verified=email_verified))
+    # store variables in session
+    session[config.PROFILE_KEY] = user_info
+    session['email'] = email
+    session['id_token'] = id_token
+
+    return redirect(url_for('home', email_verified=email_verified))
 
 
 def decode_jwt(token):
@@ -147,8 +155,8 @@ def decode_jwt(token):
 
 @votr.route('/logout')
 def logout():
-    if 'profile' in session:
-        session.pop('profile')
+    if config.PROFILE_KEY in session:
+        session.clear()
 
         flash('Thanks for using Votr!, We hope to see you soon')
 

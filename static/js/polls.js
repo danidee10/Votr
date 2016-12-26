@@ -1,6 +1,6 @@
 var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
-var browserHistory = ReactRouter.browserHistory
+var browserHistory = ReactRouter.browserHistory;
 
 
 //global variable to store origin url (e.g http://localhost:5000)
@@ -229,7 +229,6 @@ var LivePreviewProps = React.createClass({
   voteHandler: function(data){
 
     var url =  origin + '/api/poll/vote'
-    console.log(localStorage.getItem('id_token'))
 
     // make patch request
     $.ajax({
@@ -240,18 +239,23 @@ var LivePreviewProps = React.createClass({
       headers: {"Authorization": "Bearer " + localStorage.getItem('id_token')},
       contentType: 'application/json; charset=utf-8',
       success: function(data){
-
         // Show toast
         toast(data.message, 4000);
 
         this.setState({selected_option: ''});
         this.props.loadPollsFromServer();
       }.bind(this),
+
       error: function(xhr, status, err){
         err = err.toString();
-        toast('Failed to cast vote');
-        console.log(err.toString());
-      }.bind(this)
+        Rollbar.error(err);
+      }.bind(this),
+
+      statusCode: {
+      401: function (response) {
+         swal('Oops!', 'You have to login before you can vote', 'error');
+       }
+     }
     });
 
   },
