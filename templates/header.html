@@ -61,13 +61,17 @@ var _rollbarConfig = {
   <div class="nav-wrapper container">
     <a id="logo-container" href="{{ url_for('home') }}" class="brand-logo">VOTR</a>
     <ul class="right hide-on-med-and-down">
-      <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
-      <li><a href="{{ url_for('polls') }}">Polls</a></li>
       <ul id="dropdown" class="dropdown-content">
-        <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Logout</a></li>
+        <li><p style="margin-left: 5px;">{{ session['profile']['nickname'] }}</p></li>
+        <li class="divider"></li>
+        <li><a href="#">Profile</a></li>
+        <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Sign out</a></li>
       </ul>
 
-      {% if session['profile'] %}<li><a class="dropdown-button" data-activates="dropdown" href="{{ url_for('polls') }}">{{ session['profile']['nickname'] }} <img style="margin-top: 5px;" height="30" src="{{session['profile']['picture'] }}" class="circle" /></a></li>
+      {% if session['profile'] %}
+
+      <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
+      <li><a class="dropdown-button" data-activates="dropdown" style="width: 110px;" href="{{ url_for('polls') }}"><img style="margin-top: 15px; margin-right: -10px;" height="30" src="{{session['profile']['picture'] }}" class="circle" /><i class="material-icons right">arrow_drop_down</i></a></li>
 
       {% else %}
 
@@ -78,13 +82,12 @@ var _rollbarConfig = {
 
     <ul id="nav-mobile" class="side-nav">
       <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
-      <li><a href="{{ url_for('polls') }}">Polls</a></li>
 
       {% if not session['profile'] %}
       <li><a onclick="lock.show()">Login</a></li>
       {% else %}
 
-      <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Logout</a></li>
+      <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Sign out</a></li>
 
       {% endif %}
 
