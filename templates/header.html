@@ -62,7 +62,7 @@ var _rollbarConfig = {
     <a id="logo-container" href="{{ url_for('home') }}" class="brand-logo">VOTR</a>
     <ul class="right hide-on-med-and-down">
       <ul id="dropdown" class="dropdown-content">
-        <li><p style="margin-left: 5px;">{{ session['profile']['nickname'] }}</p></li>
+        <li><p style="margin-left: 5px;">{% if session['profile'] %}{{ session['profile']['nickname'] }}{% endif %}</p></li>
         <li class="divider"></li>
         <li><a href="#">Profile</a></li>
         <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Sign out</a></li>

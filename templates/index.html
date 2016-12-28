@@ -111,7 +111,7 @@
         <p><a class="white-text chat-clients" href="#">Skype</a></p>
       </div>
 
-      <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SEE HOW</a>
+      <a href="#" onClick='help()' id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SEE HOW</a>
 
     </div>
 </div>
@@ -196,6 +196,11 @@
   // if dialog message is not 'None' or 'False'
   if(dialog_message.length > 5){
     swal("Oops!", '{{ dialog_message }}', 'error')
+  }
+
+  // gitlab help
+  function help(){
+    swal("Sorry!", "We're still working on this", "error");
   }
 </script>
 
