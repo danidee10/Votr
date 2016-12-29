@@ -9,7 +9,9 @@
           <p>Votr is the #1 solution for creating polls and surveys online.</p>
           <h5 class="header col s12 light"></h5>
           <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">CREATE YOUR FREE POLL</a>
-          {% if not session['profile'] %}<a onclick="lock.show();" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SIGN UP</a>{% endif %}
+          {% if not session['profile'] %}
+          <a onclick="lock.show();" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SIGN UP</a>
+          {% endif %}
         </div>
 
         <div class="row col s12 m6">

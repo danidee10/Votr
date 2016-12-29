@@ -126,3 +126,21 @@ nav ul li {
   height: 60px;
   width: 220px;
 }
+
+main {
+  padding-left: 300px;
+}
+
+#create-poll {
+  margin-left: 40px;
+}
+
+#create-poll button{
+  margin-left: 10px;
+  padding-left: 5px;
+}
+
+#nav-mobile li a {
+  font-size: 18px;
+  font-weight: bold;
+}

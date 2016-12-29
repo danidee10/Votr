@@ -163,6 +163,11 @@ def logout():
     return redirect(url_for('home'))
 
 
+@votr.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+
 @votr.route('/polls', methods=['GET'])
 def polls():
     return render_template('polls.html')
