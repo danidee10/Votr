@@ -2,6 +2,12 @@ var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
 var browserHistory = ReactRouter.browserHistory;
 
+try {
+var SimpleTimePicker = ReactSimpleTimePicker.SimpleTimePicker;
+} catch(e){
+  console.log(e);
+}
+
 //global variable to store origin url (e.g http://localhost:5000)
 var origin = window.location.origin;
 
@@ -18,8 +24,6 @@ var PollForm = React.createClass({
     // close poll in 24 hours by default
     var close_date = new Date();
     close_date.setHours(close_date.getHours() + 23);
-    close_date = close_date.getTime() / 1000;
-
 
     return {title: '', option: '', options: [], close_date: close_date}
   },
@@ -39,6 +43,10 @@ var PollForm = React.createClass({
     options: this.state.options.concat({name: this.Option.value}),
     option: ''
     });
+  },
+
+  onDateChange: function(date){
+    this.setState({close_date: date});
   },
 
   componentDidMount: function(){
@@ -68,7 +76,7 @@ var PollForm = React.createClass({
     e.preventDefault();
     var title = this.state.title;
     var options = this.state.options;
-    var close_date = this.state.close_date;
+    var close_date = this.state.close_date.getTime() / 1000;
 
     var data = {title: title,
                 options: options.map(function(x){return x.name}),
@@ -91,6 +99,11 @@ var PollForm = React.createClass({
         toast('Poll creation failed: ' + err.toString());
       }.bind(this)
     });
+
+
+    // Clear the form
+    this.replaceState(this.getInitialState());
+
   },
 
   render: function(){
@@ -98,7 +111,7 @@ var PollForm = React.createClass({
     return (
       <div className="container">
         <div className="row">
-          <div id="poll" className="card col s12 m5">
+          <div id="poll" className="card col s12 m12 l5">
             <form onSubmit={this.handleSubmit}>
               <h5 className="center">Create a poll</h5>
 
@@ -119,6 +132,11 @@ var PollForm = React.createClass({
                 <label htmlFor="options">Option</label>
               </div>
 
+              <div className="input-field col s12">
+                <i className="material-icons prefix">schedule</i>
+                <SimpleTimePicker days="7" onChange={this.onDateChange} style={{ 'marginLeft': '50px' }} />
+              </div>
+
               <div id="create-poll" className="input-field col s12">
                 <button className="waves-effect waves-light btn" type="button" onClick={this.handleOptionAdd}><i className="material-icons left">playlist_add</i>Add option</button>
                 <button className="waves-effect waves-light btn" type="submit"><i className="material-icons left">cloud</i>Save</button>
@@ -128,7 +146,7 @@ var PollForm = React.createClass({
           </div>
 
           <div className="center">
-            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m7'} />
+            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m12 l7'} />
           </div>
         </div>
       </div>
@@ -183,7 +201,7 @@ var LivePreview = React.createClass({
             <div className="collapsible-header">
               <p>
                 <input name="options" type="radio" id={option.name} value={option.name} onChange={this.handleOptionChange} />
-                <label htmlFor={option.name}>{option.name}</label>
+                <label htmlFor={option.name}>{option.name}</label> <span style={{ 'float': 'right', 'color': 'teal' }}>{current.width}</span>
               </p>
               <div className="progress">
                 <div className="determinate" style={current}></div>
@@ -281,7 +299,7 @@ var LivePreviewProps = React.createClass({
       }
 
       return (
-        <LivePreview key={poll.title} title={poll.title} options={poll.options}
+        <LivePreview key={poll.id} title={poll.title} options={poll.options}
         total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler}
         close_date={time_remaining} classContext={this.props.classContext} />
     );
