@@ -252,7 +252,7 @@ var LivePreviewProps = React.createClass({
 
       statusCode: {
       401: function (response) {
-         swat('Oops!', 'You have to login before you can vote', 'error');
+         swal('Oops!', 'You have to login before you can vote', 'error');
        }
      }
    });
