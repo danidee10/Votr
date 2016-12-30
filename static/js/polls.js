@@ -75,7 +75,7 @@ var PollForm = React.createClass({
                 close_date: close_date
               };
 
-    var url =  origin + '/api/polls'
+    var url =  origin + '/api/polls';
 
     // make post request
     $.ajax({

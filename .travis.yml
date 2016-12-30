@@ -1,13 +1,26 @@
+addons:
+  ssh_known_hosts: 52.37.191.68
+
+before_install:
+- openssl aes-256-cbc -K $encrypted_b6cee59088b6_key -iv $encrypted_b6cee59088b6_iv
+  -in deploy_rsa.enc -out deploy_rsa -d
+- eval "$(ssh-agent -s)"
+- chmod 600 deploy_rsa
+- ssh-add deploy_rsa
+
 language: python
 python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-# Install dependencies
-install: "pip install -r requirements.txt"
-
-# command to run tests
+- '2.7'
+- '3.5'
+install: pip install -r requirements.txt
 script: nosetests -vd
 
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: rsync -r --delete-after --quiet --exclude="*.env" $TRAVIS_BUILD_DIR/Votr ubuntu@52.37.191.68:/home/ubuntu; ssh ubuntu@52.37.191.68 'sudo service uwsgi restart'
+  on:
+    branch: master
+
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
