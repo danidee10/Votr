@@ -1,7 +1,6 @@
 var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
-var browserHistory = ReactRouter.browserHistory
-
+var browserHistory = ReactRouter.browserHistory;
 
 //global variable to store origin url (e.g http://localhost:5000)
 var origin = window.location.origin;
@@ -76,7 +75,7 @@ var PollForm = React.createClass({
                 close_date: close_date
               };
 
-    var url =  origin + '/api/polls'
+    var url =  origin + '/api/polls';
 
     // make post request
     $.ajax({
@@ -120,7 +119,7 @@ var PollForm = React.createClass({
                 <label htmlFor="options">Option</label>
               </div>
 
-              <div className="input-field col s12">
+              <div id="create-poll" className="input-field col s12">
                 <button className="waves-effect waves-light btn" type="button" onClick={this.handleOptionAdd}><i className="material-icons left">playlist_add</i>Add option</button>
                 <button className="waves-effect waves-light btn" type="submit"><i className="material-icons left">cloud</i>Save</button>
               </div>
@@ -211,9 +210,9 @@ var LivePreview = React.createClass({
                     <div className="card-action">
                       <button type="submit" disabled={this.state.disabled}
                       className="btn btn-success">Vote!</button>
-                        <span>   </span>
-                        <span className="poll-footer">{this.props.total_vote_count} Votes so far
-                         | {this.props.close_date}</span>
+                        <p>{this.props.total_vote_count} Votes so far
+                        <i style={{marginLeft: '10px', paddingRight: '5px', verticalAlign: 'middle'}} className="tiny material-icons">schedule</i>
+                        {this.props.close_date}</p>
                     </div>
                   </form>
                 </div>
@@ -229,7 +228,6 @@ var LivePreviewProps = React.createClass({
   voteHandler: function(data){
 
     var url =  origin + '/api/poll/vote'
-    console.log(localStorage.getItem('id_token'))
 
     // make patch request
     $.ajax({
@@ -240,19 +238,24 @@ var LivePreviewProps = React.createClass({
       headers: {"Authorization": "Bearer " + localStorage.getItem('id_token')},
       contentType: 'application/json; charset=utf-8',
       success: function(data){
-
         // Show toast
         toast(data.message, 4000);
 
         this.setState({selected_option: ''});
         this.props.loadPollsFromServer();
       }.bind(this),
+
       error: function(xhr, status, err){
         err = err.toString();
-        toast('Failed to cast vote');
-        console.log(err.toString());
-      }.bind(this)
-    });
+        Rollbar.error(err);
+      }.bind(this),
+
+      statusCode: {
+      401: function (response) {
+         swat('Oops!', 'You have to login before you can vote', 'error');
+       }
+     }
+   });
 
   },
 
