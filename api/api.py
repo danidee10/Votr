@@ -109,7 +109,7 @@ def api_polls():
         close_poll.apply_async((new_topic.id, env['SQLALCHEMY_DATABASE_URI']),
                                eta=eta)
 
-        return jsonify({'message': 'Poll was created succesfully'})
+        return jsonify({'message': 'Poll created succesfully'})
 
     else:
         # it's a GET request, return dict representations of the API
@@ -178,7 +178,7 @@ def api_poll_vote():
         return jsonify({'message': 'Thank you for voting'})
 
     return jsonify({'message':
-                    'Option or poll was not found please try again'})
+                    'Option or Poll not found. Please try again'})
 
 
 @api.route('/poll/<poll_name>')

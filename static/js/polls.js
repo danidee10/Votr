@@ -100,20 +100,16 @@ var PollForm = React.createClass({
       }.bind(this)
     });
 
-
-    // Clear the form
-    this.replaceState(this.getInitialState());
-
   },
 
   render: function(){
 
     return (
-      <div className="container">
+      <div>
         <div className="row">
-          <div id="poll" className="card col s12 m12 l5">
+          <div id="poll" className="card col s12 m12 l5 push-l1">
             <form onSubmit={this.handleSubmit}>
-              <h5 className="center">Create a poll</h5>
+              <p className="center" style={{ 'fontSize': '25px', 'fontWeight': 'bold' }}>Create a poll</p>
 
               <div className="input-field col s12">
                 <i className="material-icons prefix">mode_edit</i>
@@ -146,7 +142,7 @@ var PollForm = React.createClass({
           </div>
 
           <div className="center">
-            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m12 l7'} />
+            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m12 l5 push-l1'} />
           </div>
         </div>
       </div>
@@ -201,7 +197,7 @@ var LivePreview = React.createClass({
             <div className="collapsible-header">
               <p>
                 <input name="options" type="radio" id={option.name} value={option.name} onChange={this.handleOptionChange} />
-                <label htmlFor={option.name}>{option.name}</label> <span style={{ 'float': 'right', 'color': 'teal' }}>{current.width}</span>
+                <label htmlFor={option.name} className="radio-labels">{option.name}</label> <span style={{ 'float': 'right', 'color': 'teal' }}>{current.width}</span>
               </p>
               <div className="progress">
                 <div className="determinate" style={current}></div>
@@ -401,6 +397,7 @@ ReactDOM.render((
   <Router history={browserHistory}>
     <Route path="/" component={AllPolls} />
     <Route path="/polls" component={PollForm} />
+    <Route path="/dashboard" component={PollForm} />
     <Route path="/polls/:pollName" component={AllPolls} />
   </Router>
   ),

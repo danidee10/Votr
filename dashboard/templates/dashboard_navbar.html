@@ -1,0 +1,91 @@
+<!-- Override navbar styles-->
+<style>
+
+body {
+  background-color: rgba(221, 221, 221, 0.3);
+}
+
+nav {
+  width: auto;
+  margin-left: -20px;
+}
+
+nav ul a, nav .brand-logo {
+  color: #ffffff;
+}
+
+nav ul a:hover {
+  background-color: transparent;
+  border-bottom: 2px solid #ffffff;
+  height: 64px;
+}
+
+.side-nav {
+  width: 220px;
+}
+
+#nav-mobile li a {
+  font-size: 16px;
+}
+
+#nav-mobile li *:hover {
+  color: teal !important;
+}
+
+
+.active-navbar {
+  border-left: 5px solid #272D4E;
+  background-color: rgba(221, 221, 221, 0.3);
+  color: teal;
+}
+
+.active-navbar * {
+  color: teal !important;
+}
+
+.active-navbar:hover {
+  background-color: rgba(221, 221, 221, 0.3);
+}
+
+
+</style>
+
+<nav class="bt-blue" role="navigation">
+  <div class="nav-wrapper container">
+    <a id="logo-container" href="{{ url_for('home') }}" class="brand-logo">VOTR</a>
+    <ul class="right hide-on-med-and-down">
+
+      <ul id="dropdown" class="dropdown-content">
+        <li><p style="margin-left: 14px;">{% if session['profile'] %}{{ session['profile']['nickname'] | capitalize }}{% endif %}</p></li>
+        <li class="divider"></li>
+        <li><a href="#">Profile</a></li>
+        <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Sign out</a></li>
+      </ul>
+
+      {% if session['profile'] %}
+
+      <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
+      <li><a class="dropdown-button" data-activates="dropdown" href="{{ url_for('polls') }}"><img style="display:inline-block; vertical-align: text-bottom;" height="30" src="{{session['profile']['picture'] }}" class="circle" /> Hello {{session['profile']['nickname'] | capitalize }} <i class="material-icons right">arrow_drop_down</i></a></li>
+
+      {% else %}
+
+      <li><a onclick="lock.show();">Login</a></li>
+
+      {% endif %}
+    </ul>
+
+    <ul id="nav-mobile" class="side-nav">
+      <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
+
+      {% if not session['profile'] %}
+      <li><a onclick="lock.show()">Login</a></li>
+      {% else %}
+
+      <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Sign out</a></li>
+
+      {% endif %}
+
+    </ul>
+    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+  </div>
+</nav>

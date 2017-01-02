@@ -22,6 +22,7 @@ var _rollbarConfig = {
 
 <!-- CSS  -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
 <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
 <link href="{{ url_for('static', filename='css/materialize.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
 <link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
@@ -55,43 +56,3 @@ var _rollbarConfig = {
   {% endif %}
 </script>
 </head>
-
-<body>
-<nav class="white" role="navigation">
-  <div class="nav-wrapper container">
-    <a id="logo-container" href="{{ url_for('home') }}" class="brand-logo">VOTR</a>
-    <ul class="right hide-on-med-and-down">
-      <ul id="dropdown" class="dropdown-content">
-        <li><p style="margin-left: 14px;">{% if session['profile'] %}{{ session['profile']['nickname'] | capitalize }}{% endif %}</p></li>
-        <li class="divider"></li>
-        <li><a href="#">Profile</a></li>
-        <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Sign out</a></li>
-      </ul>
-
-      {% if session['profile'] %}
-
-      <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
-      <li><a class="dropdown-button" data-activates="dropdown" href="{{ url_for('polls') }}"><img style="display:inline-block; vertical-align: text-bottom;" height="30" src="{{session['profile']['picture'] }}" class="circle" /> Hello {{session['profile']['nickname'] | capitalize }} <i class="material-icons right">arrow_drop_down</i></a></li>
-
-      {% else %}
-
-      <li><a onclick="lock.show();">Login</a></li>
-
-      {% endif %}
-    </ul>
-
-    <ul id="nav-mobile" class="side-nav">
-      <li><a href="{{ url_for('polls') }}">Dashboard</a></li>
-
-      {% if not session['profile'] %}
-      <li><a onclick="lock.show()">Login</a></li>
-      {% else %}
-
-      <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Sign out</a></li>
-
-      {% endif %}
-
-    </ul>
-    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-  </div>
-</nav>

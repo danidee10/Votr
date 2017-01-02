@@ -12,6 +12,7 @@ import requests
 
 # Blueprints
 from api.api import api
+from dashboard.dashboard import dashboard
 
 # celery
 from celery import Celery
@@ -46,6 +47,7 @@ def make_celery(app):
 votr = Flask(__name__)
 
 votr.register_blueprint(api)
+votr.register_blueprint(dashboard)
 
 # load config from the config file we created earlier
 votr.config.from_object('config')

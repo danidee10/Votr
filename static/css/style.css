@@ -61,11 +61,21 @@ footer.page-footer {
 
 html {
   font-family: 'Dosis', sans-serif;
-  font-size: 17px;
+  font-size: 15px;
 }
 
 p {
   font-size: 17px;
+}
+
+a {
+  font-weight: bold;
+}
+
+.radio-labels {
+  font-size: 16px !important;
+  color: #333 !important;
+  font-weight: bold !important;
 }
 
 @font-face {
@@ -73,7 +83,7 @@ p {
   src: url('../../static/fonts/Hipstelvetica Bold.ttf');
 }
 
-nav .brand-logo {
+.brand-logo {
   font-family: 'Hipstelvetica';
   padding-top: 5px;
 }
@@ -81,6 +91,11 @@ nav .brand-logo {
 .jumbotron-column {
   margin-top: 60px;
   font-weight: bold;
+}
+
+.link-active {
+  border-bottom: 2px solid #272D4E;
+  height: 64px;
 }
 
 #index-banner {
@@ -91,7 +106,17 @@ nav .brand-logo {
 }
 
 nav ul li {
-  font-weight: bold;
+  margin-right: 5px;
+}
+
+nav ul a:hover {
+  background-color: transparent;
+  border-bottom: 2px solid #272D4E;
+  height: 64px;
+}
+
+.dashboard-sidebar li a {
+  color: #444;
 }
 
 .bt-blue {
@@ -140,6 +165,5 @@ main {
 }
 
 #nav-mobile li a {
-  font-size: 18px;
   font-weight: bold;
 }

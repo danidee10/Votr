@@ -1,0 +1,47 @@
+{% include 'header.html' %}
+
+
+<!-- Page Layout here -->
+<div class="row">
+
+ <div class="col s2">
+   <ul id="nav-mobile" class="side-nav fixed dashboard-sidebar">
+
+       <div class="nav-wrapper">
+         <form>
+           <div class="input-field">
+             <input id="search" type="search" required>
+             <label for="search"><i class="material-icons">search</i>Search for a poll</label>
+             <i class="material-icons">close</i>
+           </div>
+         </form>
+       </div>
+
+     <li class="bold active-navbar" style="font-weight: bold;"><a href="#" class="waves-effect waves-teal"><i class="material-icons">format_list_numbered</i>Polls</a></li>
+     <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons">check_box</i>Surveys</a></li>
+     <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons">dashboard</i>Stack ups</a></li>
+     <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons">trending_up</i>Analytics</a></li>
+   </ul>
+ </div>
+
+<div class="col s12 m12 l10">
+  {% include 'dashboard_navbar.html' %}
+
+  <br />
+
+  <!-- Container to render react components -->
+  <div id="polls-container">
+  </div>
+
+ 
+</div>
+
+</div>
+
+<!--  Scripts-->
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="{{ url_for('static', filename='js/bundle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
+<script src="{{ url_for('static', filename='js/init.js') }}"></script>
+</body>
+</html>

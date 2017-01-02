@@ -1,210 +1,212 @@
 {% include 'header.html' %}
 
+<body>
+  {% include 'navbar.html' %}
 
-<div id="index-banner" class="section no-pad-bot">
+  <div id="index-banner" class="section no-pad-bot">
+      <div class="container">
+        <div class="row">
+          <div class="col s12 m6 jumbotron-column">
+            <h5 class="header teal-text text-lighten-2">The #1 way to create polls on the web</h5>
+            <p>Votr is the #1 solution for creating polls and surveys online.</p>
+            <h5 class="header col s12 light"></h5>
+            <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">CREATE YOUR FREE POLL</a>
+            {% if not session['profile'] %}
+            <a onclick="lock.show();" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SIGN UP</a>
+            {% endif %}
+          </div>
+
+          <div class="row col s12 m6">
+            <h2 style="text-align: center; margin-top: 60px;">Get Feedback On What Your Audience thinks!</h2>
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <div class="a">
+    <div class="section">
+
+      <h4 class="center bt-blue-text">Much more than polls</h4>
+
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m3">
+          <div class="icon-block">
+            <h2 class="center"><i class="material-icons">lock_outline</i></h2>
+            <h5 class="center">Secure</h5>
+          </div>
+        </div>
+
+        <div class="col s12 m3">
+          <div class="icon-block">
+            <h2 class="center"><i class="material-icons">thumb_up</i></h2>
+            <h5 class="center">It"s free</h5>
+          </div>
+        </div>
+
+        <div class="col s12 m3">
+          <div class="icon-block">
+            <h2 class="center"><i class="material-icons">stay_current_portrait</i></h2>
+            <h5 class="center">Optimized for mobile</h5>
+          </div>
+        </div>
+
+        <div class="col s12 m3">
+          <div class="icon-block">
+            <h2 class="center"><i class="material-icons">question_answer</i></h2>
+            <h5 class="center">Integrated comments</h5>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center"><i class="material-icons">supervisor_account</i></h2>
+            <h5 class="center">Share on social media</h5>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center"><i class="material-icons">code</i></h2>
+            <h5 class="center">Developer API</h5>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center"><i class="material-icons">trending_up</i></h2>
+            <h5 class="center">Analytics on results</h5>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <div id="index-banner" class="section no-pad-bot">
+      <div class="row center">
+        <h4 class="header col s12 teal-text text-lighten-2">
+          VOTR Supports popular chat clients, so you never have to leave to run a poll
+        </h4>
+
+        <br />
+
+        <div class="col s12 m4">
+          <img src="{{ url_for('static', filename='images/telegram.png') }}" height="100" alt="telegram" />
+          <br>
+          <p><a class="white-text chat-clients" href="#">Telegram</a></p>
+        </div>
+
+        <div class="col s12 m4">
+          <img src="{{ url_for('static', filename='images/slack.png') }}" height="100" alt="slack" />
+          <br>
+          <p><a class="white-text chat-clients" href="#">Slack</a></p>
+        </div>
+
+        <div class="col s12 m4">
+          <img src="{{ url_for('static', filename='images/skype.png') }}" height="100" alt="Skype" />
+          <br>
+          <p><a class="white-text chat-clients" href="#">Skype</a></p>
+        </div>
+
+        <a href="#" onClick='help()' id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SEE HOW</a>
+
+      </div>
+  </div>
+
+  <div class="row">
+    <div class="col S12 m3">
+      <div class="card-panel bt-blue featured">
+        <h5 class="white-text">FEATURED POLLS</h5>
+      </div>
+    </div>
+  </div>
+
+  <div id="polls-container">
+
+  </div>
+
+
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light">What are you waiting for, Sign up now and start creating polls</h5>
+          <!-- Latest patch release (recommended for production) -->
+
+          <button onclick="lock.show();" class="btn-large waves-effect waves-light teal lighten-1">Sign up</a>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="{{ url_for('static', filename='images/background3.jpg') }}" alt="Unsplashed background img 3"></div>
+  </div>
+
+  <footer class="page-footer teal">
     <div class="container">
       <div class="row">
-        <div class="col s12 m6 jumbotron-column">
-          <h5 class="header teal-text text-lighten-2">The #1 way to create polls on the web</h5>
-          <p>Votr is the #1 solution for creating polls and surveys online.</p>
-          <h5 class="header col s12 light"></h5>
-          <a href="{{url_for('polls')}}" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">CREATE YOUR FREE POLL</a>
-          {% if not session['profile'] %}
-          <a onclick="lock.show();" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SIGN UP</a>
-          {% endif %}
+        <div class="col l6 s12">
+          <h5 class="white-text">About Votr</h5>
+          <p class="grey-text text-lighten-4">
+            Our aim is to make it easy for anyone to create polls and get feedback from their target audience.
+            <br />
+            Votr is still under heavy developement, If you experience any problems using this site or you have any suggestions,
+            don't hesitate to contact us.
+          </p>
         </div>
 
-        <div class="row col s12 m6">
-          <h2 style="text-align: center; margin-top: 60px;">Get Feedback On What Your Audience thinks!</h2>
+        <div class="col l3 s12">
+
+        </div>
+
+        <div class="col l3 s12">
+          <h5 class="white-text">Get in touch</h5>
+          <ul>
+            <li><a class="white-text" href="https://gitlab.com/danidee/Votr">Gitlab</a></li>
+            <li><a class="white-text" href="https://github.com/danidee10/Votr">Github</a></li>
+            <li><a class="white-text" href="https://twitter.com/osaetindaniel">Twitter</a></li>
+            <li><a class="white-text" href="#!">Email</a></li>
+          </ul>
         </div>
       </div>
     </div>
-</div>
-
-<div class="a">
-  <div class="section">
-
-    <h4 class="center bt-blue-text">Much more than polls</h4>
-
-    <!--   Icon Section   -->
-    <div class="row">
-      <div class="col s12 m3">
-        <div class="icon-block">
-          <h2 class="center"><i class="material-icons">lock_outline</i></h2>
-          <h5 class="center">Secure</h5>
-        </div>
-      </div>
-
-      <div class="col s12 m3">
-        <div class="icon-block">
-          <h2 class="center"><i class="material-icons">thumb_up</i></h2>
-          <h5 class="center">It"s free</h5>
-        </div>
-      </div>
-
-      <div class="col s12 m3">
-        <div class="icon-block">
-          <h2 class="center"><i class="material-icons">stay_current_portrait</i></h2>
-          <h5 class="center">Optimized for mobile</h5>
-        </div>
-      </div>
-
-      <div class="col s12 m3">
-        <div class="icon-block">
-          <h2 class="center"><i class="material-icons">question_answer</i></h2>
-          <h5 class="center">Integrated comments</h5>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="row">
-
-      <div class="col s12 m4">
-        <div class="icon-block">
-          <h2 class="center"><i class="material-icons">supervisor_account</i></h2>
-          <h5 class="center">Share on social media</h5>
-        </div>
-      </div>
-
-      <div class="col s12 m4">
-        <div class="icon-block">
-          <h2 class="center"><i class="material-icons">code</i></h2>
-          <h5 class="center">Developer API</h5>
-        </div>
-      </div>
-
-      <div class="col s12 m4">
-        <div class="icon-block">
-          <h2 class="center"><i class="material-icons">trending_up</i></h2>
-          <h5 class="center">Analytics on results</h5>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-
-<div id="index-banner" class="section no-pad-bot">
-    <div class="row center">
-      <h4 class="header col s12 teal-text text-lighten-2">
-        VOTR Supports popular chat clients, so you never have to leave to run a poll
-      </h4>
-
-      <br />
-
-      <div class="col s12 m4">
-        <img src="{{ url_for('static', filename='images/telegram.png') }}" height="100" alt="telegram" />
-        <br>
-        <p><a class="white-text chat-clients" href="#">Telegram</a></p>
-      </div>
-
-      <div class="col s12 m4">
-        <img src="{{ url_for('static', filename='images/slack.png') }}" height="100" alt="slack" />
-        <br>
-        <p><a class="white-text chat-clients" href="#">Slack</a></p>
-      </div>
-
-      <div class="col s12 m4">
-        <img src="{{ url_for('static', filename='images/skype.png') }}" height="100" alt="Skype" />
-        <br>
-        <p><a class="white-text chat-clients" href="#">Skype</a></p>
-      </div>
-
-      <a href="#" onClick='help()' id="download-button" class="btn-large waves-effect waves-light teal lighten-1">SEE HOW</a>
-
-    </div>
-</div>
-
-<div class="row">
-  <div class="col S12 m3">
-    <div class="card-panel bt-blue featured">
-      <h5 class="white-text">FEATURED POLLS</h5>
-    </div>
-  </div>
-</div>
-
-<div id="polls-container">
-
-</div>
-
-
-<div class="parallax-container valign-wrapper">
-  <div class="section no-pad-bot">
-    <div class="container">
-      <div class="row center">
-        <h5 class="header col s12 light">What are you waiting for, Sign up now and start creating polls</h5>
-        <!-- Latest patch release (recommended for production) -->
-
-        <button onclick="lock.show();" class="btn-large waves-effect waves-light teal lighten-1">Sign up</a>
+    <div class="footer-copyright">
+      <div class="container">
+      Votr
       </div>
     </div>
-  </div>
-  <div class="parallax"><img src="{{ url_for('static', filename='images/background3.jpg') }}" alt="Unsplashed background img 3"></div>
-</div>
-
-<footer class="page-footer teal">
-  <div class="container">
-    <div class="row">
-      <div class="col l6 s12">
-        <h5 class="white-text">About Votr</h5>
-        <p class="grey-text text-lighten-4">
-          Our aim is to make it easy for anyone to create polls and get feedback from their target audience.
-          <br />
-          Votr is still under heavy developement, If you experience any problems using this site or you have any suggestions,
-          don't hesitate to contact us.
-        </p>
-      </div>
-
-      <div class="col l3 s12">
-
-      </div>
-
-      <div class="col l3 s12">
-        <h5 class="white-text">Get in touch</h5>
-        <ul>
-          <li><a class="white-text" href="https://gitlab.com/danidee/Votr">Gitlab</a></li>
-          <li><a class="white-text" href="https://github.com/danidee10/Votr">Github</a></li>
-          <li><a class="white-text" href="https://twitter.com/osaetindaniel">Twitter</a></li>
-          <li><a class="white-text" href="#!">Email</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="footer-copyright">
-    <div class="container">
-    Votr
-    </div>
-  </div>
-</footer>
+  </footer>
 
 
-<!--  Scripts-->
-<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-<script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
-<script src="{{ url_for('static', filename='js/init.js') }}"></script>
-<script>
-  var email_verified = '{{ email_verified }}';
-  var dialog_message = "{{ dialog_message }}"
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/init.js') }}"></script>
+  <script>
+    var email_verified = '{{ email_verified }}';
+    var dialog_message = "{{ dialog_message }}"
 
-  if(email_verified == 'False'){
-    swal('Almost there!', 'Please check your inbox ({{ email }}) and verify your account', 'success')
-  }
+    if(email_verified == 'False'){
+      swal('Almost there!', 'Please check your inbox ({{ email }}) and verify your account', 'success')
+    }
 
-  console.log(dialog_message)
+    console.log(dialog_message)
 
-  // if dialog message is not 'None' or 'False'
-  if(dialog_message.length > 5){
-    swal("Oops!", '{{ dialog_message }}', 'error')
-  }
+    // if dialog message is not 'None' or 'False'
+    if(dialog_message.length > 5){
+      swal("Oops!", '{{ dialog_message }}', 'error')
+    }
 
-  // gitlab help
-  function help(){
-    swal("Sorry!", "We're still working on this", "error");
-  }
-</script>
+    // gitlab help
+    function help(){
+      swal("Sorry!", "We're still working on this", "error");
+    }
+  </script>
 
 </body>
 </html>
