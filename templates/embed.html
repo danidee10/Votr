@@ -1,0 +1,27 @@
+{% include 'header.html' %}
+
+    <style>
+    html, body {
+      overflow: hidden;
+      margin: -10px;
+      padding: 0px;
+    }
+
+    iframe {
+      border: 1px solid #999;
+      display: block;
+    }
+    </style>
+
+    <div id="polls-container">
+    </div>
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js') }}"></script>
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/init.js') }}"></script>
+  </body>
+</html>

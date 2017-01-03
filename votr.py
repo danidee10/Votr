@@ -54,7 +54,7 @@ votr.config.from_object('config')
 
 # create the database
 db.init_app(votr)
-db.create_all(app=votr)
+# db.create_all(app=votr)
 
 migrate = Migrate(votr, db, render_as_batch=True)
 
@@ -165,17 +165,18 @@ def logout():
     return redirect(url_for('home'))
 
 
-@votr.route('/dashboard')
-def dashboard():
-    return render_template('dashboard.html')
+@votr.route('/new_poll', methods=['GET'])
+def new_poll():
+    return render_template('new_poll.html')
 
 
-@votr.route('/polls', methods=['GET'])
-def polls():
-    return render_template('polls.html')
-
-
-@votr.route('/polls/<poll_name>')
+@votr.route('/poll/<poll_name>')
 def poll(poll_name):
 
-    return render_template('polls.html')
+    return render_template('poll.html')
+
+
+@votr.route('/embed/<poll_name>')
+def embed(poll_name):
+
+    return render_template('embed.html')

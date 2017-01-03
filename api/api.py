@@ -2,9 +2,8 @@ from models import db, Polls, Topics, Options, UserPolls
 from flask import Blueprint, request, jsonify, _request_ctx_stack
 from functools import wraps
 from datetime import datetime
-import jwt
 import os
-import config
+from helpers import decode_jwt, handle_api_errors
 
 from flask_cors import cross_origin
 
@@ -18,23 +17,15 @@ except IOError:
 api = Blueprint('api', __name__, url_prefix='/api')
 
 
-# Authentication attribute
-def authenticate(error):
-    resp = jsonify(error)
-
-    resp.status_code = 401
-
-    return resp
-
-
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         auth = request.headers.get('Authorization')
 
         if not auth:
-            return authenticate({'code': 'authorization_header_missing',
-                                'message': 'Authorization header is expected'})
+            return handle_api_errors({'code': 'authorization_header_missing',
+                                     'message':
+                                      'Authorization header is expected'})
 
         parts = auth.split()
 
@@ -49,23 +40,8 @@ def requires_auth(f):
                     'message': 'Authorization header must be Bearer \s token'}
 
         token = parts[1]
-        try:
-            payload = jwt.decode(
-                        token, env[config.AUTH0_CLIENT_SECRET],
-                        audience=env[config.AUTH0_CLIENT_ID],
-                        algorithms=['HS256'],
-                        options={'verify_iat': False}
-                    )
 
-        except jwt.ExpiredSignature:
-            return authenticate({'code': 'token_expired',
-                                'message': 'token is expired'})
-        except jwt.InvalidAudienceError:
-            return authenticate({'code': 'invalid_audience',
-                                'message': 'incorrect audience'})
-        except jwt.DecodeError:
-            return authenticate({'code': 'token_invalid_signature',
-                                'message': 'token signature is invalid'})
+        payload = decode_jwt(token)
 
         _request_ctx_stack.top.current_user = payload
         return f(*args, **kwargs)
@@ -88,6 +64,13 @@ def api_polls():
 
         title = poll['title']
 
+        id_token = poll.get('id_token')
+
+        if id_token:
+            user_identifier = decode_jwt(id_token).get('email')
+        else:
+            user_identifier = None
+
         # return option that matches a given name
         def options_query(option):
             return Options.query.filter(Options.name.like(option))
@@ -98,7 +81,8 @@ def api_polls():
                    for option in poll['options']]
 
         eta = datetime.utcfromtimestamp(poll['close_date'])
-        new_topic = Topics(title=title, options=options, close_date=eta)
+        new_topic = Topics(title=title, user_identifier=user_identifier,
+                           options=options, close_date=eta)
 
         db.session.add(new_topic)
         db.session.commit()

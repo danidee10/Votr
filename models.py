@@ -34,9 +34,7 @@ class Topics(Base):
     create_uid = db.Column(db.ForeignKey('users.id'))
     close_date = db.Column(db.DateTime)
 
-    created_by = db.relationship('Users', foreign_keys=[create_uid],
-                                 backref=db.backref('user_polls',
-                                 lazy='dynamic'))
+    user_identifier = db.Column(db.String(100))
 
     # user friendly way to display the object
     def __repr__(self):

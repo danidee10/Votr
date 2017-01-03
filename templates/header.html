@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 <title>Votr! - Create polls online</title>
 
+<!-- Hotjar Tracking Code for http://52.37.191.68/ -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:380724,hjsv:5};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
 <!-- Rollbar -->
 <script>
 var _rollbarConfig = {
@@ -52,7 +64,7 @@ var _rollbarConfig = {
 
   {% if id_token %}
     // save the JWT if the token is set
-    localStorage.setItem('id_token', '{{ id_token }}');
+    sessionStorage.setItem('id_token', '{{ id_token }}');
   {% endif %}
 </script>
 </head>

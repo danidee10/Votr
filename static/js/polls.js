@@ -25,7 +25,8 @@ var PollForm = React.createClass({
     var close_date = new Date();
     close_date.setHours(close_date.getHours() + 23);
 
-    return {title: '', option: '', options: [], close_date: close_date}
+    return {title: '', option: '', options: [],
+            close_date: close_date, success: false, height: '', width: ''}
   },
 
   handleTitleChange: function(e){
@@ -75,10 +76,11 @@ var PollForm = React.createClass({
   handleSubmit: function(e){
     e.preventDefault();
     var title = this.state.title;
+    var id_token = sessionStorage['id_token'];
     var options = this.state.options;
     var close_date = this.state.close_date.getTime() / 1000;
 
-    var data = {title: title,
+    var data = {title: title, id_token: id_token,
                 options: options.map(function(x){return x.name}),
                 close_date: close_date
               };
@@ -93,7 +95,13 @@ var PollForm = React.createClass({
       data: JSON.stringify(data),
       contentType: 'application/json; charset=utf-8',
       success: function(data){
+
+        // set height of pollform for iframe embed and success
+        var height = $('#pollform').height();
+        var width = $('#pollform').width();
+        this.setState({success: true, height: height, width: width});
         toast(data.message);
+
       }.bind(this),
       error: function(xhr, status, err){
         toast('Poll creation failed: ' + err.toString());
@@ -103,6 +111,12 @@ var PollForm = React.createClass({
   },
 
   render: function(){
+
+    var encodedPollName = encodeURIComponent(this.state.title);
+    var embedIframe = `<iframe src="${origin}/embed/${encodedPollName}"
+height="${this.state.height}" width="${this.state.width}"\
+frameBorder="0" />`;
+    var directLink = `${origin}/poll/${encodedPollName}`;
 
     return (
       <div>
@@ -145,6 +159,24 @@ var PollForm = React.createClass({
             <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m12 l5 push-l1'} />
           </div>
         </div>
+
+        <div className="row">
+          <div className="col s11 m12 l11 push-l1">
+            {
+              this.state.success ?
+                <div>
+                  <h5 style={{'color': 'red'}}>Your poll was created succesfully</h5>
+                  <p>You can embed this poll as an iframe with:</p>
+                  <pre>{embedIframe}</pre>
+                  <p>You can also use the direct link (Ideal if this is not an anonymous poll)</p>
+                  <pre>{directLink}</pre>
+                </div>
+              :
+                <h5></h5>
+            }
+          </div>
+        </div>
+
       </div>
     );
   }
@@ -212,7 +244,7 @@ var LivePreview = React.createClass({
     return(
 
             <div className={this.props.classContext}>
-              <div className="card blue-grey darken-3">
+              <div id="pollform" className="card blue-grey darken-3">
                 <div className="card-content white-text">
                   <span className="card-title">{this.props.title}</span>
 
@@ -249,7 +281,7 @@ var LivePreviewProps = React.createClass({
       dataType: 'json',
       type: 'PATCH',
       data: JSON.stringify(data),
-      headers: {"Authorization": "Bearer " + localStorage.getItem('id_token')},
+      headers: {"Authorization": "Bearer " + sessionStorage.getItem('id_token')},
       contentType: 'application/json; charset=utf-8',
       success: function(data){
         // Show toast
@@ -396,9 +428,10 @@ var AllPolls = React.createClass({
 ReactDOM.render((
   <Router history={browserHistory}>
     <Route path="/" component={AllPolls} />
-    <Route path="/polls" component={PollForm} />
+    <Route path="/new_poll" component={PollForm} />
     <Route path="/dashboard" component={PollForm} />
-    <Route path="/polls/:pollName" component={AllPolls} />
+    <Route path="/embed/:pollName" component={AllPolls} />
+    <Route path="/poll/:pollName" component={AllPolls} />
   </Router>
   ),
   document.getElementById('polls-container')
