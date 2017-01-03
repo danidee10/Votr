@@ -75,7 +75,7 @@ class Testvotr():
     def test_new_poll(self):
         result = requests.post(self.hostname + '/api/polls',
                                json=self.poll).json()
-        assert {'message': 'Poll was created succesfully'} == result
+        assert {'message': 'Poll created succesfully'} == result
 
     def vote(self, jwt):
         headers = {'Authorization': 'Bearer ' + jwt}
