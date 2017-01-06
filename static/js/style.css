@@ -1,0 +1,24 @@
+.time-picker {
+  font-weight: bold;
+  font-family: mono;
+  font-size: 30px !important;
+  background-color: transparent !important;
+  color: inherit;
+  border: none;
+  width: 17% !important;
+  display:inline !important;
+}
+
+.days {
+  right: 57px;
+}
+
+small {
+    margin-right: 20px !important;
+    right: 52px !important;
+}
+
+
+*:focus {
+    outline: none;
+}

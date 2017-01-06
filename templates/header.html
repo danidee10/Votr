@@ -35,20 +35,9 @@ var _rollbarConfig = {
 <!-- CSS  -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
-<link href="{{ url_for('static', filename='css/materialize.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
-<link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
-
-<!-- React JS -->
-<script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
-<script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
-<script src="https://npmcdn.com/react-router@2.8.1/umd/ReactRouter.min.js"></script>
-<script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
-<script type="text/babel" src="{{ url_for('static', filename='js/polls.js') }}"></script>
+<script src="{{ url_for('static', filename='prod/header_assets.js') }}"></script>
 
 <script src="http://cdn.auth0.com/js/lock/10.7.2/lock.min.js"></script>
-<script src="{{ url_for('static', filename='js/sweetalert.min.js') }}"></script>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sweetalert.css') }}">
 <script>
   var base_url = window.location
 

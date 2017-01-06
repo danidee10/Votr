@@ -1,12 +1,7 @@
-var Router = ReactRouter.Router;
-var Route = ReactRouter.Route;
-var browserHistory = ReactRouter.browserHistory;
-
-try {
-var SimpleTimePicker = ReactSimpleTimePicker.SimpleTimePicker;
-} catch(e){
-  console.log(e);
-}
+import React from 'react'
+import { render } from 'react-dom'
+import { Router, Route, browserHistory } from 'react-router'
+import SimpleTimePicker from './react-simple-time-picker.jsx'
 
 //global variable to store origin url (e.g http://localhost:5000)
 var origin = window.location.origin;
@@ -246,7 +241,7 @@ var LivePreview = React.createClass({
             <div className={this.props.classContext}>
               <div id="pollform" className="card blue-grey darken-3">
                 <div className="card-content white-text">
-                  <span className="card-title">{this.props.title}</span>
+                  <span className="card-title center">{this.props.title}</span>
 
                   <form onSubmit={this.voteHandler}>
                     <ul className="collapsible" data-collapsible="accordion">
@@ -298,6 +293,7 @@ var LivePreviewProps = React.createClass({
 
       statusCode: {
       401: function (response) {
+         console.log(response);
          swal('Oops!', 'You have to login before you can vote', 'error');
        }
      }
@@ -425,9 +421,8 @@ var AllPolls = React.createClass({
     }
   });
 
-ReactDOM.render((
+render((
   <Router history={browserHistory}>
-    <Route path="/" component={AllPolls} />
     <Route path="/new_poll" component={PollForm} />
     <Route path="/dashboard" component={PollForm} />
     <Route path="/embed/:pollName" component={AllPolls} />

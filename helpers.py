@@ -1,7 +1,7 @@
 import jwt
 import os
 import config
-from flask import jsonify
+from flask import jsonify, abort
 
 # Load env file
 from dotenv import Dotenv
@@ -12,10 +12,7 @@ except IOError:
 
 
 def handle_api_errors(error):
-    resp = jsonify(error)
-    resp.status_code = 401
-
-    return resp
+    abort(401, error)
 
 
 def decode_jwt(token):
@@ -29,12 +26,12 @@ def decode_jwt(token):
 
     except jwt.ExpiredSignature:
         return handle_api_errors({'code': 'token_expired',
-                            'message': 'token is expired'})
+                                  'message': 'token is expired'})
     except jwt.InvalidAudienceError:
         return handle_api_errors({'code': 'invalid_audience',
-                            'message': 'incorrect audience'})
+                                  'message': 'incorrect audience'})
     except jwt.DecodeError:
         return handle_api_errors({'code': 'token_invalid_signature',
-                            'message': 'token signature is invalid'})
+                                  'message': 'token signature is invalid'})
 
     return payload

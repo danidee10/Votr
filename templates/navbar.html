@@ -1,6 +1,5 @@
-<nav class="white" role="navigation">
+<nav class="bt-blue" role="navigation">
   <div class="nav-wrapper container">
-    <a id="logo-container" href="{{ url_for('home') }}" class="brand-logo">VOTR</a>
     <ul class="right hide-on-med-and-down">
       <ul id="dropdown" class="dropdown-content">
         <li><p style="margin-left: 14px;">{% if session['profile'] %}{{ session['profile']['nickname'] | capitalize }}{% endif %}</p></li>
@@ -19,6 +18,12 @@
       <li><a onclick="lock.show();">Login</a></li>
 
       {% endif %}
+    </ul>
+
+    <ul class="left">
+      <li class="hipstelvetica"><a href="{{ url_for('home') }}">VOTR</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#">Integrations</a></li>
     </ul>
 
     <ul id="nav-mobile" class="side-nav">

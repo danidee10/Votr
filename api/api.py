@@ -30,14 +30,20 @@ def requires_auth(f):
         parts = auth.split()
 
         if parts[0].lower() != 'bearer':
-            return {'code': 'invalid_header',
-                    'message': 'Authorization header must start with Bearer'}
+            return handle_api_errors({'code': 'invalid_header',
+                                      'message':
+                                      'Authorization header must\
+                                            start with Bearer'})
+
         elif len(parts) == 1:
-            return {'code': 'invalid_header',
-                    'message': 'Token not found'}
+            return handle_api_errors({'code': 'invalid_header',
+                                      'message': 'Token not found'})
+
         elif len(parts) > 2:
-            return {'code': 'invalid_header',
-                    'message': 'Authorization header must be Bearer \s token'}
+            return handle_api_errors({'code': 'invalid_header',
+                                      'message':
+                                      'Authorization header must\
+                                            be Bearer \s token'})
 
         token = parts[1]
 

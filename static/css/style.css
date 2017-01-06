@@ -9,6 +9,7 @@
 nav ul a,
 nav .brand-logo {
   color: #444;
+  font-size: 16px;
 }
 
 p {
@@ -59,8 +60,13 @@ footer.page-footer {
 
 /*=============== Custom styles=========================*/
 
+@font-face {
+  font-family: 'Verlag';
+  src: url('../../static/fonts/BrandonGrotesque-Regular.ttf');
+}
+
 html {
-  font-family: 'Dosis', sans-serif;
+  font-family: 'Verlag', sans-serif;
   font-size: 15px;
 }
 
@@ -83,9 +89,14 @@ a {
   src: url('../../static/fonts/Hipstelvetica Bold.ttf');
 }
 
-.brand-logo {
+.hipstelvetica a {
   font-family: 'Hipstelvetica';
-  padding-top: 5px;
+  font-size: 40px;
+  text-decoration: none;
+}
+
+.hipstelvetica a:hover {
+  border-bottom: none;
 }
 
 .jumbotron-column {
@@ -131,14 +142,6 @@ nav ul li {
   color: white;
   padding-bottom: 20px;
 }
-.github-commit {
-    padding: 14px 0;
-    height: 64px;
-    line-height: 36px;
-    background-color: #4db6ac !important;
-    color: #e6e6e6;
-    font-size: .9rem;
-}
 
 .featured {
   padding: 3px;
@@ -148,9 +151,6 @@ nav ul li {
 
 main {
   padding-left: 300px;
-}
-
-#create-poll {
 }
 
 #create-poll button{
@@ -165,4 +165,34 @@ main {
 pre {
   width: 90%;
   background-color: #ccc;
+}
+
+nav {
+  width: auto;
+  margin-left: -20px;
+}
+
+nav ul a, nav .brand-logo {
+  color: #ffffff;
+}
+
+nav ul a:hover {
+  background-color: transparent;
+  border-bottom: 2px solid #ffffff;
+}
+
+.side-nav {
+  width: 220px;
+}
+
+#nav-mobile li a {
+  font-size: 16px;
+}
+
+#nav-mobile li *:hover {
+  color: teal !important;
+}
+
+.bold {
+  font-weight: bold;
 }

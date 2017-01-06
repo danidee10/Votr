@@ -8542,20 +8542,3 @@ button.picker__today:focus, button.picker__clear:focus, button.picker__close:foc
     margin-bottom: 5em;
   }
 }
-
-/* Custom style from materialize gh pages */
-#nav-mobile li.search .search-wrapper {
-  margin: 0 12px;
-  transition: margin .25s ease;
-}
-
-#nav-mobile li.search .search-wrapper input#search {
-    display: block;
-    font-size: 16px;
-    font-weight: 300;
-    width: 100%;
-    height: 45px;
-    margin: 0;
-    padding: 0 45px 0 15px;
-    border: 0;
-}

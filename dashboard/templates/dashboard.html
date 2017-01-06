@@ -24,24 +24,20 @@
    </ul>
  </div>
 
-<div class="col s12 m12 l10">
-  {% include 'dashboard_navbar.html' %}
+  <div class="col s12 m12 l10">
+    {% include 'dashboard_navbar.html' %}
 
-  <br />
+    <br />
 
-  <!-- Container to render react components -->
-  <div id="polls-container">
+    <!-- Container to render react components -->
+    <div id="polls-container">
+    </div>
+
+
   </div>
 
- 
 </div>
 
-</div>
-
-<!--  Scripts-->
-<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="{{ url_for('static', filename='js/bundle.js') }}"></script>
-<script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
-<script src="{{ url_for('static', filename='js/init.js') }}"></script>
+{% include 'footer.html' %}
 </body>
 </html>
