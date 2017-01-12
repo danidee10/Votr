@@ -34,11 +34,12 @@ var _rollbarConfig = {
 
 <!-- CSS  -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
 <script src="{{ url_for('static', filename='prod/header_assets.js') }}"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/sweetalert2/6.3.0/sweetalert2.min.css" integrity="sha256-+Ri3Pm294y8V+Wp8KAUxGSsVQuqqUt1J5wqKeUWDQB0=" crossorigin="anonymous">
 
+<script src="https://cdn.jsdelivr.net/sweetalert2/6.3.0/sweetalert2.min.js" integrity="sha256-WuccoSb2WYxuQAKOvfwqaJLcheNf0syg+3v4m2yuPzw=" crossorigin="anonymous"></script>
 <script src="http://cdn.auth0.com/js/lock/10.7.2/lock.min.js"></script>
-<script>
+<script async>
   var base_url = window.location
 
   var lock = new Auth0Lock('Hiv6T72A0eqhq4RXAFXx0FcncXW5xTsD', 'danidee.auth0.com', {

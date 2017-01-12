@@ -37,6 +37,10 @@
   </div>
 
 </div>
+<script type="text/javascript">
+  var clientId = "{{ session['client_id'] }}";
+  sessionStorage['clientId'] = clientId;
+</script>
 
 {% include 'footer.html' %}
 </body>

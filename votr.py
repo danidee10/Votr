@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, session, redirect,g
+from flask import Flask, render_template, request, flash, session, redirect, g
 from flask import url_for
 from flask_migrate import Migrate
 from models import db, Users, Polls, Topics, Options, UserPolls
@@ -9,6 +9,8 @@ import os
 import config
 import jwt
 import requests
+import uuid
+from base64 import urlsafe_b64encode as url_encode
 
 # Blueprints
 from api.api import api
@@ -94,6 +96,7 @@ def init_rollbar():
 
 
 @votr.route('/')
+# TODO Refactor and store variables in the session
 def home():
     id_token = session.get('id_token')
     email = session.get('email')
@@ -124,7 +127,6 @@ def callback_handling():
     token_info = requests.post(token_url, json=token_payload,
                                headers=json_header).json()
     id_token = token_info['id_token']
-
     user_info = decode_jwt(id_token)
 
     if not user_info.get('email'):
@@ -135,15 +137,32 @@ def callback_handling():
 
         return render_template('index.html', dialog_message=dialog_message)
 
+    # generate uuid and create a new user with a uuid, a better solution would
+    # be to detect the signup or authenticate event and store the client_id as
+    # the users metadata with Auth0
     email = user_info.get('email')
-    email_verified = user_info.get('email_verified', False)
+    user = Users.query.filter_by(email=email).first()
+
+    if not user:
+        client_id = url_encode(str(uuid.uuid4()).encode('utf-8')).decode()
+        new_user = Users(email=email, client_id=client_id)
+        db.session.add(new_user)
+        db.session.commit()
+        session['client_id'] = client_id
+    else:
+        session['client_id'] = user.client_id
 
     # store variables in session
     session[config.PROFILE_KEY] = user_info
     session['email'] = email
     session['id_token'] = id_token
 
-    return redirect(url_for('home', email_verified=email_verified))
+    email_verified = user_info.get('email_verified', False)
+
+    if not email_verified:
+        return redirect(url_for('home', email_verified=email_verified))
+    else:
+        return redirect(url_for('dashboard.index'))
 
 
 def decode_jwt(token):

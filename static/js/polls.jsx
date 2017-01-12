@@ -20,6 +20,7 @@ var PollForm = React.createClass({
     var close_date = new Date();
     close_date.setHours(close_date.getHours() + 23);
 
+    // TODO close_date, height,width aren't supposed to be state variables
     return {title: '', option: '', options: [],
             close_date: close_date, success: false, height: '', width: ''}
   },
@@ -106,12 +107,28 @@ var PollForm = React.createClass({
   },
 
   render: function(){
+    var height = this.state.height;
+    var width = this.state.width;
 
+    var embedScriptLink = `${origin}/static/embed/embed.js`
     var encodedPollName = encodeURIComponent(this.state.title);
     var embedIframe = `<iframe src="${origin}/embed/${encodedPollName}"
-height="${this.state.height}" width="${this.state.width}"\
+height="${height}" width="${width}"\
 frameBorder="0" />`;
     var directLink = `${origin}/poll/${encodedPollName}`;
+    var clientId = sessionStorage['clientId'];
+
+    var javascriptEmbed = `<script type='text/javascript'>
+      (function(i,s,o,g,r,a,m){i['VotrObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','${embedScriptLink}','votr');
+     (function init(){ if (document.readyState == "complete") {
+        votr('${clientId}',
+            '${encodedPollName}',
+            '${embedScriptLink}', ${height}, ${width}
+            );}else{window.setTimeout(init, 30);}})();
+    </script>`
 
     return (
       <div>
@@ -151,7 +168,7 @@ frameBorder="0" />`;
           </div>
 
           <div className="center">
-            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m12 l5 push-l1'} />
+            <LivePreview title={this.state.title} options={this.state.options} classContext={'col s12 m12 l4 push-l1'} />
           </div>
         </div>
 
@@ -160,11 +177,26 @@ frameBorder="0" />`;
             {
               this.state.success ?
                 <div>
-                  <h5 style={{'color': 'red'}}>Your poll was created succesfully</h5>
-                  <p>You can embed this poll as an iframe with:</p>
-                  <pre>{embedIframe}</pre>
-                  <p>You can also use the direct link (Ideal if this is not an anonymous poll)</p>
+                  <h5 id="#embed-instructions" className="bold red-text">Embed instructions</h5>
+                  <hr />
+
+                  <p className="bold teal-text">Direct Link</p>
                   <pre>{directLink}</pre>
+
+                  <br />
+
+                  <p className=" bold teal-text">Embed as Iframe (<em>Very Flexible, Ideal for blog posts</em>)</p>
+                  <pre>{embedIframe}</pre>
+
+                  <br />
+
+                  <p className="bold teal-text">Load poll asynchronously via javascript (<em>Embed between <span className="red-text">{"<head></head>"}</span> tag</em>)</p>
+                  <pre>{javascriptEmbed}</pre>
+
+                  <br />
+
+                  <pre><span style={{'color': 'red'}}>PRO-TIP:</span> You can adjust the size of the iframe by
+                  changing the values of the width and height</pre>
                 </div>
               :
                 <h5></h5>
@@ -224,7 +256,7 @@ var LivePreview = React.createClass({
             <div className="collapsible-header">
               <p>
                 <input name="options" type="radio" id={option.name} value={option.name} onChange={this.handleOptionChange} />
-                <label htmlFor={option.name} className="radio-labels">{option.name}</label> <span style={{ 'float': 'right', 'color': 'teal' }}>{current.width}</span>
+                <label htmlFor={option.name} className="radio-labels">{option.name}</label> <small style={{ 'float': 'right', 'color': 'teal' }}>{current.width}</small>
               </p>
               <div className="progress">
                 <div className="determinate" style={current}></div>
@@ -250,10 +282,11 @@ var LivePreview = React.createClass({
 
                     <div className="card-action">
                       <button type="submit" disabled={this.state.disabled}
-                      className="btn btn-success">Vote!</button>
-                        <p>{this.props.total_vote_count} Votes so far
+                      className="btn btn-success">Submit</button>
+                        <br />
+                        <small> {this.props.total_vote_count} Votes
                         <i style={{marginLeft: '10px', paddingRight: '5px', verticalAlign: 'middle'}} className="tiny material-icons">schedule</i>
-                        {this.props.close_date}</p>
+                        {this.props.close_date}</small>
                     </div>
                   </form>
                 </div>
@@ -403,7 +436,7 @@ var AllPolls = React.createClass({
       }
     } else {
         return (
-          <div className="center">
+          <div className="center" style={{'marginTop': '10%'}}>
             <div className="preloader-wrapper small active">
               <div className="spinner-layer spinner-green-only">
                 <div className="circle-clipper left">

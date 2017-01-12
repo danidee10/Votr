@@ -60,6 +60,9 @@ footer.page-footer {
 
 /*=============== Custom styles=========================*/
 
+@media only screen and (max-width: 992px) {
+}
+
 @font-face {
   font-family: 'Verlag';
   src: url('../../static/fonts/BrandonGrotesque-Regular.ttf');
@@ -79,7 +82,7 @@ a {
 }
 
 .radio-labels {
-  font-size: 16px !important;
+  font-size: 15px !important;
   color: #333 !important;
   font-weight: bold !important;
 }
@@ -195,4 +198,12 @@ nav ul a:hover {
 
 .bold {
   font-weight: bold;
+}
+
+#pollform .card-title {
+  font-size: 19px;
+}
+
+#pollform .card-content {
+  padding-bottom: 0px;
 }

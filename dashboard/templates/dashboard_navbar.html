@@ -53,11 +53,9 @@ nav ul a:hover {
 <nav class="bt-blue" role="navigation">
   <div class="nav-wrapper container">
 
-    <ul class="left">
-      <li class="hipstelvetica"><a href="{{ url_for('home') }}">VOTR</a></li>
-    </ul>
 
-    <ul class="right hide-on-med-and-down">
+
+    <ul class="right">
       <ul id="dropdown" class="dropdown-content">
         <li><p style="margin-left: 14px;">{% if session['profile'] %}{{ session['profile']['nickname'] | capitalize }}{% endif %}</p></li>
         <li class="divider"></li>
