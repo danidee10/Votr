@@ -1,7 +1,6 @@
 stages:
   - runtests
   - deploy
-  - migrate
 
 test2.7:
   stage: runtests
@@ -41,18 +40,10 @@ deploy_to_production:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - echo "Deploy to staging server\n"
     - rsync -avz -e 'ssh' /builds/danidee/Votr --recursive --exclude="*.env" $ROOT_DIRECTORY
+    - echo 'Running migrations if any...'
+    - ssh $SSH_REMOTE -t 'cd $VOTR_DIRECTORY && bash && flask db stamp && flask db migrate && flask db upgrade'
   environment:
     name: production
   only:
   - master
   when: manual
-
-run_migrations:
-  stage: migrate
-  script:
-    - echo 'Running migrations...'
-    - ssh $SSH_REMOTE -t 'cd $VOTR_DIRECTORY && bash && flask db stamp && flask db migrate && flask db upgrade'
-  environment:
-    name: production
-  only:
-    - master
