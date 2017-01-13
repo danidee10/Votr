@@ -51,4 +51,8 @@ run_migrations:
   stage: migrate
   script:
     - echo 'Running migrations...'
-    - $SSH_VOTR_DIRECTORY 'flask db stamp && flask db migrate && flask db upgrade'
+    - ssh $SSH_REMOTE -t 'cd $VOTR_DIRECTORY && bash && flask db stamp && flask db migrate && flask db upgrade'
+  environment:
+    name: production
+  only:
+    - master
