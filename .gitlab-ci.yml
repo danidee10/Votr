@@ -41,7 +41,7 @@ deploy_to_production:
     - echo "Deploy to staging server\n"
     - rsync -avz -e 'ssh' /builds/danidee/Votr --recursive --exclude="*.env" $ROOT_DIRECTORY
     - echo 'Running migrations if any...'
-    - ssh $SSH_REMOTE -t 'cd $VOTR_DIRECTORY && export FLASK_APP=votr.py && flask db stamp && flask db migrate && flask db upgrade'
+    - ssh $SSH_REMOTE 'python migrate.py'
   environment:
     name: production
   only:
