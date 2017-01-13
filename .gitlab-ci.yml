@@ -1,6 +1,7 @@
 stages:
   - runtests
   - deploy
+  - migrate
 
 test2.7:
   stage: runtests
@@ -39,10 +40,15 @@ deploy_to_production:
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - echo "Deploy to staging server\n"
-    - rsync -avz -e 'ssh' /builds/danidee/Votr --recursive --exclude="*.env" ubuntu@52.37.191.68:/home/ubuntu
-    - ssh ubuntu@52.37.191.68 'sudo service uwsgi restart'
+    - rsync -avz -e 'ssh' /builds/danidee/Votr --recursive --exclude="*.env" $ROOT_DIRECTORY
   environment:
     name: production
   only:
   - master
   when: manual
+
+run_migrations:
+  stage: migrate
+  script:
+    - echo 'Running migrations...'
+    - $SSH_VOTR_DIRECTORY 'flask db stamp && flask db migrate && flask db upgrade'
