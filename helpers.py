@@ -1,12 +1,12 @@
 import jwt
 import os
 import config
-from flask import jsonify, abort
+from flask import abort
 
 # Load env file
 from dotenv import Dotenv
 try:
-    env = Dotenv('.env')
+    env = Dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 except IOError:
     env = os.environ
 

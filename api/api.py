@@ -10,7 +10,7 @@ from flask_cors import cross_origin
 # Load env file
 from dotenv import Dotenv
 try:
-    env = Dotenv('.env')
+    env = Dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
 except IOError:
     env = os.environ
 
