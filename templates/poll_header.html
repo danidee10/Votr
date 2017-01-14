@@ -1,3 +1,4 @@
+{# Refactor later and use a better structure to layout Auth0's lock #}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,16 +41,15 @@ var _rollbarConfig = {
 <script src="https://cdn.jsdelivr.net/sweetalert2/6.3.0/sweetalert2.min.js" integrity="sha256-WuccoSb2WYxuQAKOvfwqaJLcheNf0syg+3v4m2yuPzw=" crossorigin="anonymous"></script>
 <script src="http://cdn.auth0.com/js/lock/10.7.2/lock.min.js"></script>
 
-{% block lock %}
 <script async>
-  var base_url = window.location
 
   var lock = new Auth0Lock('Hiv6T72A0eqhq4RXAFXx0FcncXW5xTsD', 'danidee.auth0.com', {
     auth: {
       responseType: 'code',
-      redirectUrl: base_url + 'callback',
+      redirectUrl: `${window.location.protocol}//${window.location.hostname}:${window.location.port}/callback`,
       params: {
-        scope: 'openid profile picture email' // Learn about scopes: https://auth0.com/docs/scopes
+        scope: 'openid profile picture email',
+        state:  window.location.href
       }
     }
   });
@@ -59,5 +59,4 @@ var _rollbarConfig = {
     sessionStorage.setItem('id_token', "{{ session['id_token'] }}");
   {% endif %}
 </script>
-{% endblock lock %}
 </head>

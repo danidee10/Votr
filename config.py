@@ -2,11 +2,9 @@
 import os
 
 # Load environment variables
-from dotenv import Dotenv
-try:
-    env = Dotenv(os.path.join(os.path.dirname(__file__), '.env'))
-except IOError:
-    env = os.environ
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+env = os.environ
 
 SECRET_KEY = env['SECRET_KEY']
 SQLALCHEMY_DATABASE_URI = env['SQLALCHEMY_DATABASE_URI']
