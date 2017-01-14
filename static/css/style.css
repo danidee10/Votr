@@ -207,3 +207,14 @@ nav ul a:hover {
 #pollform .card-content {
   padding-bottom: 0px;
 }
+
+
+/* Customize sweet alert font */
+
+.swal2-title {
+  font-family: 'Verlag', sans-serif;
+}
+
+.swal2-modal .swal2-content {
+  font-family: 'Verlag', sans-serif;
+}

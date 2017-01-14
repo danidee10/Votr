@@ -20,11 +20,9 @@ from dashboard.dashboard import dashboard
 from celery import Celery
 
 # Load environment variables
-from dotenv import Dotenv
-try:
-    env = Dotenv(os.path.join(os.path.dirname(__file__), '.env'))
-except IOError:
-    env = os.environ
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+env = os.environ
 
 import rollbar
 import rollbar.contrib.flask
@@ -98,21 +96,20 @@ def init_rollbar():
 @votr.route('/')
 # TODO Refactor and store variables in the session
 def home():
-    id_token = session.get('id_token')
-    email = session.get('email')
     email_verified = request.args.get('email_verified')
-
     logout_url = request.url_root + 'logout'
 
-    params = {'id_token': id_token, 'email': email,
-              'email_verified': email_verified, 'logout_url': logout_url}
+    params = {'email_verified': email_verified, 'logout_url': logout_url}
 
     return render_template('index.html', **params)
 
 
 @votr.route('/callback')
 def callback_handling():
+    # get params from Auth0
     code = request.args.get(config.CODE_KEY)
+    redirect_url = request.args.get('state')
+
     json_header = {config.CONTENT_TYPE_KEY: config.APP_JSON_KEY}
     token_url = 'https://{auth0_domain}/oauth/token'.format(
                     auth0_domain=env[config.AUTH0_DOMAIN])
@@ -156,6 +153,9 @@ def callback_handling():
     session[config.PROFILE_KEY] = user_info
     session['email'] = email
     session['id_token'] = id_token
+
+    if redirect_url:
+        return redirect(redirect_url)
 
     email_verified = user_info.get('email_verified', False)
 

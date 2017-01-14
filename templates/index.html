@@ -172,11 +172,11 @@
   <script src="{{ url_for('static', filename='js/init.js') }}"></script>
 
   <script>
-    var email_verified = '{{ email_verified }}';
+    var email_verified = "{{ email_verified }}";
     var dialog_message = "{{ dialog_message }}"
 
     if(email_verified == 'False'){
-      swal('Almost there!', 'Please check your inbox ({{ email }}) and verify your account', 'success')
+      swal('Almost there!', "Please check your inbox ({{ session.get('email') }}) and verify your account", 'success')
     }
 
     console.log(dialog_message)

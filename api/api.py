@@ -7,12 +7,10 @@ from helpers import decode_jwt, handle_api_errors
 
 from flask_cors import cross_origin
 
-# Load env file
-from dotenv import Dotenv
-try:
-    env = Dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
-except IOError:
-    env = os.environ
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv(os.path.join('.env'))
+env = os.environ
 
 api = Blueprint('api', __name__, url_prefix='/api')
 

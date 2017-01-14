@@ -3,13 +3,10 @@ import os
 import config
 from flask import abort
 
-# Load env file
-from dotenv import Dotenv
-try:
-    env = Dotenv(os.path.join(os.path.dirname(__file__), '.env'))
-except IOError:
-    env = os.environ
-
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+env = os.environ
 
 def handle_api_errors(error):
     abort(401, error)
