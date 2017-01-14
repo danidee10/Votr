@@ -8,12 +8,10 @@ from tasks import close_poll
 import jwt
 import config
 
-# Load env file
-from dotenv import Dotenv
-try:
-    env = Dotenv('.env')
-except IOError:
-    env = os.environ
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+env = os.environ
 
 
 # helper to generate JWT's
