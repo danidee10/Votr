@@ -96,12 +96,9 @@ def init_rollbar():
 @votr.route('/')
 # TODO Refactor and store variables in the session
 def home():
-    email_verified = request.args.get('email_verified')
     logout_url = request.url_root + 'logout'
 
-    params = {'email_verified': email_verified, 'logout_url': logout_url}
-
-    return render_template('index.html', **params)
+    return render_template('index.html', logout_url=logout_url)
 
 
 @votr.route('/callback')
@@ -127,12 +124,13 @@ def callback_handling():
     user_info = decode_jwt(id_token)
 
     if not user_info.get('email'):
-        dialog_message = "We could not get your email address from {} ."\
+        flash_message = "We could not get your email address from {} ."\
             "Please create an Email/Password account "\
             "or try another social signup.".\
             format(user_info['identities'][0]['provider'].capitalize())
+        flash(flash_message, 'error')
 
-        return render_template('index.html', dialog_message=dialog_message)
+        return render_template('index.html')
 
     # generate uuid and create a new user with a uuid, a better solution would
     # be to detect the signup or authenticate event and store the client_id as
@@ -154,13 +152,14 @@ def callback_handling():
     session['email'] = email
     session['id_token'] = id_token
 
+    # used to redirect users to the specific poll page instead of the homepage
     if redirect_url:
         return redirect(redirect_url)
 
     email_verified = user_info.get('email_verified', False)
-
     if not email_verified:
-        return redirect(url_for('home', email_verified=email_verified))
+        flash('We just sent a verification email to %s' % email, 'success')
+        return redirect(url_for('home'))
     else:
         return redirect(url_for('dashboard.index'))
 
@@ -178,8 +177,13 @@ def decode_jwt(token):
 def logout():
     if config.PROFILE_KEY in session:
         session.clear()
+        flash('Thanks for using Votr!, We hope to see you soon', 'success')
 
-        flash('Thanks for using Votr!, We hope to see you soon')
+    message = request.args.get('message', 'Not verified')
+    success = request.args.get('success')
+
+    if 'your email was verified' in message.lower() and success:
+        flash('Please login to continue using the application', 'info')
 
     return redirect(url_for('home'))
 

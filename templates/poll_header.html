@@ -47,6 +47,7 @@ var _rollbarConfig = {
     auth: {
       responseType: 'code',
       redirectUrl: `${window.location.protocol}//${window.location.hostname}:${window.location.port}/callback`,
+      loginAfterSignUp: false,
       params: {
         scope: 'openid profile picture email',
         state:  window.location.href

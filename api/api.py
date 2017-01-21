@@ -9,7 +9,7 @@ from flask_cors import cross_origin
 
 # Load environment variables
 from dotenv import load_dotenv
-load_dotenv(os.path.join('.env'))
+load_dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
 env = os.environ
 
 api = Blueprint('api', __name__, url_prefix='/api')

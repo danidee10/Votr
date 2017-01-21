@@ -1,29 +1,21 @@
 <nav class="bt-blue" role="navigation">
   <div class="nav-wrapper container">
+    <a href="{{ url_for('home') }}" class="brand-logo brand-logo-small hipstelvetica">VOTR</a>
     <ul class="right hide-on-med-and-down">
       <ul id="dropdown" class="dropdown-content">
         <li><p style="margin-left: 14px;">{% if session['profile'] %}{{ session['profile']['nickname'] | capitalize }}{% endif %}</p></li>
         <li class="divider"></li>
-        <li><a href="#">Profile</a></li>
+        <li><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
         <li><a href="https://danidee.auth0.com/v2/logout?returnTo={{ logout_url }}">Sign out</a></li>
       </ul>
 
       {% if session['profile'] %}
-
-      <li><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-      <li><a class="dropdown-button" data-activates="dropdown" href="{{ url_for('dashboard.index') }}"><img style="display:inline-block; vertical-align: text-bottom;" height="30" src="{{session['profile']['picture'] }}" class="circle" /> Hello {{session['profile']['nickname'] | capitalize }} <i class="material-icons right">arrow_drop_down</i></a></li>
-
+        <li><a class="dropdown-button" data-activates="dropdown" href="{{ url_for('dashboard.index') }}"><img style="display:inline-block; vertical-align: text-bottom;" height="30" src="{{session['profile']['picture'] }}" class="circle" /> Hello {{session['profile']['nickname'] | capitalize }} <i class="material-icons right">arrow_drop_down</i></a></li>
       {% else %}
-      <li><a class="link-active" href="{{ url_for('home') }}">Home</a></li>
-      <li><a onclick="lock.show();">Login</a></li>
-
+        <li><a onclick="lock.show();">Login</a></li>
       {% endif %}
-    </ul>
-
-    <ul class="left">
-      <li class="hipstelvetica"><a href="{{ url_for('home') }}">VOTR</a></li>
-      <li><a href="#features" class="hide-on-med-and-down">Features</a></li>
-      <li><a href="#" class="hide-on-med-and-down">Integrations</a></li>
+        <li><a href="#features" class="hide-on-med-and-down">Features</a></li>
+        <li><a href="#" class="hide-on-med-and-down">Integrations</a></li>
     </ul>
 
     <ul id="nav-mobile" class="side-nav">

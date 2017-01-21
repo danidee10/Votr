@@ -92,14 +92,10 @@ a {
   src: url('../../static/fonts/Hipstelvetica Bold.ttf');
 }
 
-.hipstelvetica a {
+.hipstelvetica {
   font-family: 'Hipstelvetica';
-  font-size: 40px;
+  font-size: 40px !important;
   text-decoration: none;
-}
-
-.hipstelvetica a:hover {
-  border-bottom: none;
 }
 
 .jumbotron-column {
@@ -177,11 +173,19 @@ nav {
 
 nav ul a, nav .brand-logo {
   color: #ffffff;
+  height: 64px;
 }
 
 nav ul a:hover {
   background-color: transparent;
   border-bottom: 2px solid #ffffff;
+}
+
+.dropdown-content a {
+  height: 50px;
+}
+.dropdown-content a:hover {
+  border-bottom: none;
 }
 
 .side-nav {

@@ -464,3 +464,5 @@ render((
   ),
   document.getElementById('polls-container')
 );
+
+$('.button-collapse').sideNav();

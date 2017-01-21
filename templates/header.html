@@ -48,8 +48,9 @@ var _rollbarConfig = {
     auth: {
       responseType: 'code',
       redirectUrl: base_url + 'callback',
+      loginAfterSignUp: false,
       params: {
-        scope: 'openid profile picture email' // Learn about scopes: https://auth0.com/docs/scopes
+        scope: 'openid profile picture email'
       }
     }
   });
