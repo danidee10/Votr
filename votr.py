@@ -19,9 +19,7 @@ from dashboard.dashboard import dashboard
 # celery
 from celery import Celery
 
-# Load environment variables
-from dotenv import load_dotenv
-load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+# Set env to loaded variables from config file
 env = os.environ
 
 import rollbar
