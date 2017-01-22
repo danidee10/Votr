@@ -181,7 +181,7 @@ def logout():
     success = request.args.get('success')
 
     if 'your email was verified' in message.lower() and success:
-        flash('Please login to continue using the application', 'info')
+        flash('Your email has been verified. You can login now', 'success')
 
     return redirect(url_for('home'))
 
