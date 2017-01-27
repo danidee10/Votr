@@ -1,0 +1,76 @@
+</html>
+
+<head>
+
+<script src="https://cdn.jsdelivr.net/clipboard.js/1.5.16/clipboard.min.js"></script>
+<script type="text/javascript" src="../static/prod/header_assets.js"></script>
+
+<style>
+
+.copybutton {
+    background-color: rgb(48, 133, 214);
+    color: white;
+    border: rgb(48, 133, 214);
+    padding: 5px;
+    border-radius: 3px;
+    vertical-align: sub;
+    margin-left: 5px;
+}
+
+.shrink {
+  font-size: 15px !important;
+  margin: 0px !important;
+}
+
+
+.swal2-modal {
+  width: 400px !important;
+  padding-top: 0px !important;
+}
+
+.swal2-modal .swal2-content .left {
+  text-align: left;
+}
+
+</style>
+
+</head>
+
+<body>
+
+</body>
+
+<script type="text/javascript">
+var clipboard = new Clipboard('.copybutton');
+
+clipboard.on('success', function(e) {
+    toast('copied', 3000);
+});
+
+swal({
+  html:
+    `<p>
+      <b class="left">Embed inside webpage</b>
+      <input style="width: 80%;" type="text" spellcheck="false" id="embedlink"
+        value='<iframe src="http://localhost:5000/embed/Webpack%20vs%20Browserify"
+        height="305" width="350"frameBorder="0" />' class="shrink" />
+      <button type="button"
+        class="copybutton" data-clipboard-target="#embedlink">Copy</button>
+    </p>
+
+    <p>
+      <b class="left">Direct link</b>
+      <input id="directlink" style="width: 80%;" type="text" class="shrink"
+        value="http://localhost:5000/embed/Webpack%20vs%20Browserify">
+      <button type="button"
+        class="copybutton" data-clipboard-target="#directlink">Copy</button>
+    </p>
+
+    <iframe src="http://localhost:5000/embed/Webpack%20vs%20Browserify"
+      height="305" width="350"frameBorder="0" />`,
+  showCloseButton: true,
+  showConfirmButton: false
+})
+</script>
+
+<html>

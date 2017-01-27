@@ -6,6 +6,13 @@ import SimpleTimePicker from './react-simple-time-picker.jsx'
 //global variable to store origin url (e.g http://localhost:5000)
 var origin = window.location.origin;
 
+//setup clipboard.js
+var clipboard = new Clipboard('.copybutton');
+
+clipboard.on('success', function(e) {
+    toast('copied', 3000);
+});
+
 // Helper to show materialize toasts
 function toast(message){
    Materialize.toast(message, 5000);
@@ -110,7 +117,6 @@ var PollForm = React.createClass({
     var height = this.state.height;
     var width = this.state.width;
 
-    var embedScriptLink = `${origin}/static/embed/embed.js`
     var encodedPollName = encodeURIComponent(this.state.title);
     var embedIframe = `<iframe src="${origin}/embed/${encodedPollName}"
 height="${height}" width="${width}"\
@@ -118,17 +124,6 @@ frameBorder="0" />`;
     var directLink = `${origin}/poll/${encodedPollName}`;
     var clientId = sessionStorage['clientId'];
 
-    var javascriptEmbed = `<script type='text/javascript'>
-      (function(i,s,o,g,r,a,m){i['VotrObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','${embedScriptLink}','votr');
-     (function init(){ if (document.readyState == "complete") {
-        votr('${clientId}',
-            '${encodedPollName}',
-            '${embedScriptLink}', ${height}, ${width}
-            );}else{window.setTimeout(init, 30);}})();
-    </script>`
 
     return (
       <div>
@@ -176,28 +171,29 @@ frameBorder="0" />`;
           <div className="col s11 m12 l11 push-l1">
             {
               this.state.success ?
-                <div>
-                  <h5 id="#embed-instructions" className="bold red-text">Embed instructions</h5>
-                  <hr />
 
-                  <p className="bold teal-text">Direct Link</p>
-                  <pre>{directLink}</pre>
+              swal({
+                html:
+                  `<p>
+                    <b class="left">Embed inside webpage</b>
+                    <input style="width: 80%;" type="text" spellcheck="false" id="embedlink"
+                      class="shrink" value='${embedIframe}' />
+                    <button type="button"
+                      class="copybutton" data-clipboard-target="#embedlink">Copy</button>
+                  </p>
 
-                  <br />
+                  <p>
+                    <b class="left">Direct link</b>
+                    <input id="directlink" style="width: 80%;" type="text"
+                      class="shrink" value="${directLink}">
+                    <button type="button"
+                      class="copybutton" data-clipboard-target="#directlink">Copy</button>
+                  </p>
 
-                  <p className=" bold teal-text">Embed as Iframe (<em>Very Flexible, Ideal for blog posts</em>)</p>
-                  <pre>{embedIframe}</pre>
-
-                  <br />
-
-                  <p className="bold teal-text">Load poll asynchronously via javascript (<em>Embed between <span className="red-text">{"<head></head>"}</span> tag</em>)</p>
-                  <pre>{javascriptEmbed}</pre>
-
-                  <br />
-
-                  <pre><span style={{'color': 'red'}}>PRO-TIP:</span> You can adjust the size of the iframe by
-                  changing the values of the width and height</pre>
-                </div>
+                  ${embedIframe}`,
+                showCloseButton: true,
+                showConfirmButton: false
+              })
               :
                 <h5></h5>
             }

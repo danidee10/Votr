@@ -162,8 +162,9 @@ main {
 }
 
 pre {
-  width: 90%;
-  background-color: #ccc;
+  width: 100%;
+  background-color: #49483e;
+  color: #fff;
 }
 
 nav {
@@ -221,4 +222,29 @@ nav ul a:hover {
 
 .swal2-modal .swal2-content {
   font-family: 'Verlag', sans-serif;
+}
+
+.copybutton {
+    background-color: #26a69a;
+    color: white;
+    border: #26a69a;
+    padding: 5px;
+    border-radius: 3px;
+    vertical-align: sub;
+    margin-left: 5px;
+    font-size: 16px;
+}
+
+.shrink {
+  font-size: 15px !important;
+  margin: 0px !important;
+}
+
+.swal2-modal {
+  width: 400px !important;
+  padding-top: 0px !important;
+}
+
+.swal2-modal .swal2-content .left {
+  text-align: left;
 }
