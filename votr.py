@@ -191,13 +191,13 @@ def new_poll():
     return render_template('new_poll.html')
 
 
-@votr.route('/poll/<poll_name>')
-def poll(poll_name):
+@votr.route('/polls/<unique_id>')
+def poll(unique_id):
 
     return render_template('poll.html')
 
 
-@votr.route('/embed/<poll_name>')
-def embed(poll_name):
+@votr.route('/embed/<unique_id>')
+def embed(unique_id):
 
     return render_template('embed.html')

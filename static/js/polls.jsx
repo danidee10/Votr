@@ -97,11 +97,13 @@ var PollForm = React.createClass({
       type: 'POST',
       data: JSON.stringify(data),
       contentType: 'application/json; charset=utf-8',
-      success: function(data){
-
-        // set height of pollform for iframe embed and success
+      success: function (data) {
+        // set height of pollform for iframe, get token
         var height = $('#pollform').height();
         var width = $('#pollform').width();
+
+        this.uniqueId = data.unique_id;
+        console.log(data);
         this.setState({success: true, height: height, width: width});
         toast(data.message);
 
@@ -116,12 +118,12 @@ var PollForm = React.createClass({
   render: function(){
     var height = this.state.height;
     var width = this.state.width;
+    var uniqueId = this.uniqueId
 
-    var encodedPollName = encodeURIComponent(this.state.title);
-    var embedIframe = `<iframe src="${origin}/embed/${encodedPollName}"
+    var embedIframe = `<iframe src="${origin}/embed/${uniqueId}"
 height="${height}" width="${width}"\
 frameBorder="0" />`;
-    var directLink = `${origin}/poll/${encodedPollName}`;
+    var directLink = `${origin}/polls/${uniqueId}`;
     var clientId = sessionStorage['clientId'];
 
 
@@ -219,7 +221,7 @@ var LivePreview = React.createClass({
   voteHandler: function(e){
     e.preventDefault();
 
-    var data = {"poll_title": this.props.title, "option": this.state.selected_option};
+    var data = {"unique_id": this.props.unique_id, "option": this.state.selected_option};
 
     //calls props handler
     this.props.voteHandler(data);
@@ -354,7 +356,8 @@ var LivePreviewProps = React.createClass({
       return (
         <LivePreview key={poll.id} title={poll.title} options={poll.options}
         total_vote_count={poll.total_vote_count} voteHandler={this.voteHandler}
-        close_date={time_remaining} classContext={this.props.classContext} />
+        unique_id={poll.unique_id} close_date={time_remaining}
+        classContext={this.props.classContext} />
     );
   }.bind(this));
 
@@ -374,16 +377,17 @@ var AllPolls = React.createClass({
 
   getInitialState: function(){
     // pollName is available as a prop
-    this.pollName = this.props.routeParams.pollName
+    this.uniqueId = this.props.routeParams.uniqueId
 
-    this.classContext = this.pollName ? 'col s12 m4 offset-m4' : 'col 12 m4'
+    this.classContext = this.uniqueId ? 'col s12 m4 offset-m4' : 'col 12 m4'
+
     return {polls: {'Polls': []}, header: '', loading: true};
   },
 
   loadPollsFromServer: function(){
 
-    if(this.pollName){
-        var url = origin + '/api/poll/' + this.pollName
+    if(this.uniqueId){
+        var url = origin + '/api/poll/' + this.uniqueId
 
     } else {
         var url = origin + '/api/polls'
@@ -454,8 +458,8 @@ render((
   <Router history={browserHistory}>
     <Route path="/new_poll" component={PollForm} />
     <Route path="/dashboard" component={PollForm} />
-    <Route path="/embed/:pollName" component={AllPolls} />
-    <Route path="/poll/:pollName" component={AllPolls} />
+    <Route path="/embed/:uniqueId" component={AllPolls} />
+    <Route path="/polls/:uniqueId" component={AllPolls} />
   </Router>
   ),
   document.getElementById('polls-container')

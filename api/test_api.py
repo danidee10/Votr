@@ -41,10 +41,11 @@ class Testvotr():
             time.sleep(2)
 
         # create new poll
-        poll = {"title": "Flask vs Django",
-                "options": ["Flask", "Django"],
-                "close_date": 1581556683}
-        requests.post(cls.hostname + '/api/polls', json=poll).json()
+        poll = {"title": "Flask vs Django", "options": ["Flask", "Django"],
+                "close_date": 1692678965}
+
+        result = requests.post(cls.hostname + '/api/polls', json=poll).json()
+        cls.unique_id = result['unique_id']
 
         # There is no need to test Auth0's auth so let's create a JWT
         payload = {'email_verified': True, 'email': 'admin@gmail.com',
@@ -73,13 +74,14 @@ class Testvotr():
     def test_new_poll(self):
         result = requests.post(self.hostname + '/api/polls',
                                json=self.poll).json()
-        assert {'message': 'Poll created succesfully'} == result
+
+        assert result['message'] ==  'Poll created succesfully'
 
     def vote(self, jwt):
         headers = {'Authorization': 'Bearer ' + jwt}
         result = requests.patch(self.hostname + '/api/poll/vote',
-                                json={'poll_title': self.poll['title'],
-                                      'option': self.poll['options'][0]},
+                                json={'unique_id': self.unique_id,
+                                      'option': 'Flask'},
                                 headers=headers).json()
         return result
 
@@ -102,8 +104,8 @@ class Testvotr():
         assert {'message':
                 'You have to verify your email before you vote'} == result
 
-    def test_celery_task(self):
 
+    def test_zelery_task(self):
         result = close_poll.apply((1, votr.config['SQLALCHEMY_DATABASE_URI']))
 
         assert 'poll closed succesfully' == result.get()

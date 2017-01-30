@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, _request_ctx_stack
 from functools import wraps
 from datetime import datetime
 import os
+import uuid
 from helpers import decode_jwt, handle_api_errors
 
 from flask_cors import cross_origin
@@ -54,8 +55,8 @@ def requires_auth(f):
 
 
 @api.route('/polls', methods=['GET', 'POST'])
-# retrieves/adds polls from/to the database
 def api_polls():
+    """Retrieves/adds polls from/to the database."""
     if request.method == 'POST':
         # get the poll and save it in the database
         poll = request.get_json()
@@ -84,9 +85,12 @@ def api_polls():
                    else Polls(option=options_query(option).first())
                    for option in poll['options']]
 
+        # generate 10 character unique hex string
+        uniq_id = uuid.uuid4().hex[:10]
+
         eta = datetime.utcfromtimestamp(poll['close_date'])
         new_topic = Topics(title=title, user_identifier=user_identifier,
-                           options=options, close_date=eta)
+                           options=options, close_date=eta, unique_id=uniq_id)
 
         db.session.add(new_topic)
         db.session.commit()
@@ -97,7 +101,8 @@ def api_polls():
         close_poll.apply_async((new_topic.id, env['SQLALCHEMY_DATABASE_URI']),
                                eta=eta)
 
-        return jsonify({'message': 'Poll created succesfully'})
+        return jsonify({'message': 'Poll created succesfully',
+                        'unique_id': uniq_id})
 
     else:
         # it's a GET request, return dict representations of the API
@@ -111,6 +116,7 @@ def api_polls():
 
 @api.route('/polls/options')
 def api_polls_options():
+    """Return all options."""
 
     all_options = {option.name: '' for option in Options.query.all()}
 
@@ -123,12 +129,12 @@ def api_polls_options():
 def api_poll_vote():
     poll = request.get_json()
 
-    poll_title, option = (poll['poll_title'], poll['option'])
+    unique_id, option = (poll['unique_id'], poll['option'])
 
     join_tables = Polls.query.join(Topics).join(Options)
 
     # Get topic and username
-    topic = Topics.query.filter_by(title=poll_title, status=True).first()
+    topic = Topics.query.filter_by(unique_id=unique_id, status=True).first()
     user = _request_ctx_stack.top.current_user
     user_identifier = user.get('email') or user.get('nickname')
 
@@ -142,7 +148,7 @@ def api_poll_vote():
         return jsonify({'message': 'Sorry! this poll has been closed'})
 
     # filter options
-    option = join_tables.filter(Topics.title.like(poll_title)).\
+    option = join_tables.filter(Topics.unique_id == (unique_id)).\
         filter(Options.name.like(option)).first()
 
     # check if the user has voted on this poll
@@ -169,9 +175,9 @@ def api_poll_vote():
                     'Option or Poll not found. Please try again'})
 
 
-@api.route('/poll/<poll_name>')
-def api_poll(poll_name):
-    poll = Topics.query.filter(Topics.title.like(poll_name)).first()
+@api.route('/poll/<unique_id>')
+def api_poll(unique_id):
+    poll = Topics.query.filter_by(unique_id=unique_id).first()
 
     return jsonify({'Polls': [poll.to_json()]} if poll
                    else {'message': 'poll not found'})

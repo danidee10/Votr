@@ -28,12 +28,14 @@ class Users(Base):
         return self.email
 
 
-# Model for poll topics
 class Topics(Base):
+    """Model for poll topics."""
+
     title = db.Column(db.String(500))
     status = db.Column(db.Boolean, default=True)  # to close or open poll
     create_uid = db.Column(db.ForeignKey('users.id'))
     close_date = db.Column(db.DateTime)
+    unique_id = db.Column(db.String(11))  # unique 10 char hex string
 
     user_identifier = db.Column(db.String(100))
 
@@ -45,6 +47,7 @@ class Topics(Base):
     def to_json(self):
         return {
                 'title': self.title,
+                'unique_id': self.unique_id,
                 'options': [{'name': option.option.name,
                             'vote_count': option.vote_count}
                             for option in self.options.all()],
@@ -104,3 +107,6 @@ class UserPolls(Base):
 
     topics = db.relationship('Topics', foreign_keys=[topic_id],
                              backref=db.backref('voted_on_by', lazy='dynamic'))
+
+    def __repr__(self):
+        return self.user_identifier
