@@ -37,7 +37,7 @@ votr.config.from_object('config')
 
 # create the database
 db.init_app(votr)
-# db.create_all(app=votr)
+db.create_all(app=votr)
 
 migrate = Migrate(votr, db, render_as_batch=True)
 
