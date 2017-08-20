@@ -4,7 +4,7 @@ Repository for my tutorial on [How to build an online voting application with Fl
 
 Don't forget to leave a comment when you visit (>‿◠)✌
 
-**NOTE: This is still a WIP**
+**NOTE: This branch contains code for the tutorial on my blog, For the latest state of this project, checkout the master branch**
 
 ## Table of content
   - Part 1 - **Introduction and installation**
