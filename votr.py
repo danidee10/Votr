@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, flash, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
@@ -33,7 +34,10 @@ votr = Flask(__name__)
 votr.register_blueprint(api)
 
 # load config from the config file we created earlier
-votr.config.from_object('config')
+if os.getenv('APP_MODE') == "PRODUCTION":
+    votr.config.from_object('config')
+else:
+    votr.config.from_object('production_settings')
 
 # create the database
 db.init_app(votr)
