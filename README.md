@@ -4,8 +4,6 @@ Repository for my tutorial on [How to build an online voting application with Fl
 
 Don't forget to leave a comment when you visit (>‿◠)✌
 
-**NOTE: This is still a WIP**
-
 ## Table of content
   - Part 1 - **Introduction and installation**
   - Part 2 - **Design and manipulate the database with SQLAlchemy**
@@ -17,6 +15,7 @@ Don't forget to leave a comment when you visit (>‿◠)✌
   - Part 8 - **Understanding Flask blueprints**
   - Part 9 - **Running background tasks with celery**
   - Part 10 - **Testing the application**
+  - Part 11 - **Deploying the Application**
 
 <br />
 
