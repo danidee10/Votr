@@ -32,12 +32,13 @@ Don't forget to leave a comment when you visit (>‿◠)✌
 ## Installation
 
 ```bash
-https://github.com/danidee10/Votr.git
+git clone https://github.com/danidee10/Votr.git
 ```
 
 Install requirements
 
 ```bash
+cd Votr
 pip install -r requirements.txt
 ```
 
