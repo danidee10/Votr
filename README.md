@@ -1,6 +1,8 @@
 # Votr
 Repository for my tutorial on [How to build an online voting application with Flask and React](https://danidee10.github.io/2016/09/18/flask-by-example-1.html)
 
+The Live Demo is available on [heroku](https://votr.herokuapp.com)
+
 
 Don't forget to leave a comment when you visit (>‿◠)✌
 
