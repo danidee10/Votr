@@ -39,9 +39,8 @@ if os.getenv('APP_MODE') == "PRODUCTION":
 else:
     votr.config.from_object('config')
 
-# create the database
-db.init_app(votr)
-db.create_all(app=votr)
+db.init_app(votr)  # Initialize the database
+# db.create_all(app=votr)  # Create the database
 
 migrate = Migrate(votr, db, render_as_batch=True)
 
