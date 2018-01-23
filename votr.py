@@ -35,9 +35,9 @@ votr.register_blueprint(api)
 
 # load config from the config file we created earlier
 if os.getenv('APP_MODE') == "PRODUCTION":
-    votr.config.from_object('config')
-else:
     votr.config.from_object('production_settings')
+else:
+    votr.config.from_object('config')
 
 # create the database
 db.init_app(votr)
