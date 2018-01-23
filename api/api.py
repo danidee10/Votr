@@ -69,7 +69,7 @@ def api_poll_vote():
     join_tables = Polls.query.join(Topics).join(Options)
 
     # Get topic and username from the database
-    topic = Topics.query.filter_by(title=poll_title, status=1).first()
+    topic = Topics.query.filter_by(title=poll_title, status=True).first()
     user = Users.query.filter_by(username=session['user']).first()
 
     # if poll was closed in the background before user voted
