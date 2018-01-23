@@ -17,7 +17,7 @@ from celery import Celery
 def make_celery(votr):
     celery = Celery(
         votr.import_name, backend=votr.config['CELERY_RESULT_BACKEND'],
-        broker=votr.config['CELERY_BROKER_URL']
+        broker=votr.config['CELERY_BROKER']
     )
     celery.conf.update(votr.config)
     TaskBase = celery.Task
