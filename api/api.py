@@ -77,7 +77,7 @@ def api_poll_vote():
         return jsonify({'message': 'Sorry! this poll has been closed'})
 
     # filter options
-    option = join_tables.filter(Topics.title.like(poll_title), Topics.status == 1).filter(Options.name.like(option)).first()
+    option = join_tables.filter(Topics.title.like(poll_title), Topics.status == True).filter(Options.name.like(option)).first()
 
     # check if the user has voted on this poll
     poll_count = UserPolls.query.filter_by(topic_id=topic.id).filter_by(user_id=user.id).count()
