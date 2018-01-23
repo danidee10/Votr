@@ -14,8 +14,11 @@ import config
 from celery import Celery
 
 
-def make_celery(app):
-    celery = Celery(app.import_name)
+def make_celery(votr):
+    celery = Celery(
+        votr.import_name, backend=votr.config['CELERY_RESULT_BACKEND'],
+        broker=votr.config['CELERY_BROKER_URL']
+    )
     celery.conf.update(votr.config)
     TaskBase = celery.Task
 
@@ -23,7 +26,7 @@ def make_celery(app):
         abstract = True
 
         def __call__(self, *args, **kwargs):
-            with app.app_context():
+            with votr.app_context():
                 return TaskBase.__call__(self, *args, **kwargs)
     celery.Task = ContextTask
 
