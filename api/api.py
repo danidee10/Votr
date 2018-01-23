@@ -46,7 +46,7 @@ def api_polls():
 
     else:
         # it's a GET request, return dict representations of the API
-        polls = Topics.query.filter_by(status=1).join(Polls).order_by(Topics.id.desc()).all()
+        polls = Topics.query.filter_by(status=True).join(Polls).order_by(Topics.id.desc()).all()
         all_polls = {'Polls':  [poll.to_json() for poll in polls]}
 
         return jsonify(all_polls)
