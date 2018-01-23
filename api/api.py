@@ -1,7 +1,13 @@
+from os import getenv
+
 from models import db, Users, Polls, Topics, Options, UserPolls
 from flask import Blueprint, request, jsonify, session
 from datetime import datetime
 from config import SQLALCHEMY_DATABASE_URI
+
+if getenv('APP_MODE') == 'PRODUCTION':
+    from production_settings import SQLALCHEMY_DATABASE_URI
+
 
 api = Blueprint('api', 'api', url_prefix='/api')
 
