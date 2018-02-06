@@ -3,9 +3,6 @@ Repository for my tutorial on [How to build an online voting application with Fl
 
 The Live Demo is available on [heroku](https://votr.herokuapp.com)
 
-
-Don't forget to leave a comment when you visit (>‿◠)✌
-
 **NOTE: This branch contains code for the tutorial on my blog, For the latest state of this project, checkout the master branch**
 
 ## Table of content
@@ -51,7 +48,7 @@ export FLASK_APP=votr.py
 export FLASK_DEBUG=1
 ```
 
-Finally run it with
+Finally run it with:
 
 ```bash
 flask run
