@@ -78,7 +78,7 @@ class Testvotr():
         result = self.vote()
         assert {'message': 'Sorry! multiple votes are not allowed'} == result
 
-    def test_celery_task(self):
+    def test_zelery_task(self):
 
         result = close_poll.apply((1, votr.config['SQLALCHEMY_DATABASE_URI'])).get()
 
