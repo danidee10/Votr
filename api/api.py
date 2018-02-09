@@ -31,8 +31,9 @@ def api_polls():
                    if options_query(option).count() == 0
                    else Polls(option=options_query(option).first()) for option in poll['options']
                    ]
+        user = Users.query.filter_by(username=session['user']).first()
         eta = datetime.utcfromtimestamp(poll['close_date'])
-        new_topic = Topics(title=title, options=options, close_date=eta)
+        new_topic = Topics(title=title, options=options, close_date=eta, create_uid=user.id)
 
         db.session.add(new_topic)
         db.session.commit()

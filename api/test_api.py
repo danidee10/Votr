@@ -25,27 +25,18 @@ class Testvotr():
             cls.p.start()
             time.sleep(2)
 
-        # create new poll
-        poll = {"title": "Flask vs Django",
-                "options": ["Flask", "Django"],
-                "close_date": 1581556683}
-        requests.post(cls.hostname + '/api/polls', json=poll).json()
 
-        # create new admin user
-        signup_data = {'email': 'admin@gmail.com', 'username': 'Administrator',
-                       'password': 'admin'}
-        requests.post(cls.hostname + '/signup', data=signup_data).text
 
     def setUp(self):
         self.poll = {"title": "who's the fastest footballer",
                      "options": ["Hector bellerin", "Gareth Bale", "Arjen robben"],
                      "close_date": 1581556683}
 
-    def test_new_user(self):
-        signup_data = {'email': 'user@gmail.com', 'username': 'User',
-                       'password': 'password'}
+    def test_create_user(self):
+        signup_data = {'email': 'user@gmail.com', 'username': 'Administrator',
+                       'password': 'admin'}
 
-        result = requests.post(self.hostname + '/signup', data=signup_data).text
+        result = self.session.post(self.hostname + '/signup', data=signup_data).text
 
         assert 'Thanks for signing up please login' in result
 
@@ -58,19 +49,19 @@ class Testvotr():
         assert 'Create a poll' in result
 
     def test_empty_option(self):
-        result = requests.post(self.hostname + '/api/polls',
+        result = self.session.post(self.hostname + '/api/polls',
                                json={"title": self.poll['title'],
                                      "options": []}).json()
         assert {'message': 'value for options is empty'} == result
 
     def test_empty_title(self):
-        result = requests.post(self.hostname + '/api/polls',
+        result = self.session.post(self.hostname + '/api/polls',
                                json={"title": "",
                                      "options": self.poll['options']}).json()
         assert {'message': 'value for title is empty'} == result
 
     def test_new_poll(self):
-        result = requests.post(self.hostname + '/api/polls', json=self.poll).json()
+        result = self.session.post(self.hostname + '/api/polls', json=self.poll).json()
         assert {'message': 'Poll was created succesfully'} == result
 
     def vote(self):
@@ -87,7 +78,7 @@ class Testvotr():
         result = self.vote()
         assert {'message': 'Sorry! multiple votes are not allowed'} == result
 
-    def test_celery_task(self):
+    def test_zelery_task(self):
 
         result = close_poll.apply((1, votr.config['SQLALCHEMY_DATABASE_URI'])).get()
 
